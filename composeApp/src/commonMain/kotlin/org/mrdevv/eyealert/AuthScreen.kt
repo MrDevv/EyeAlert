@@ -133,9 +133,10 @@ class AuthScreen:Screen{
                     fontWeight = FontWeight.ExtraLight
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color(0xFF464646),
-                backgroundColor = Color(0xFFE3E3E3),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF464646),
+                focusedContainerColor = Color(0xFFE3E3E3),
+                unfocusedContainerColor = Color(0xFFE3E3E3),
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
@@ -157,9 +158,10 @@ class AuthScreen:Screen{
                     fontWeight = FontWeight.ExtraLight
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color(0xFF464646),
-                backgroundColor = Color(0xFFE3E3E3),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF464646),
+                focusedContainerColor = Color(0xFFE3E3E3),
+                unfocusedContainerColor = Color(0xFFE3E3E3),
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
@@ -173,7 +175,7 @@ class AuthScreen:Screen{
     fun ButtonGoToLogin(onShowContentLoginChange: (Boolean) -> Unit) {
         OutlinedButton(modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Transparent,
+                containerColor = Color.Transparent,
                 contentColor = Color(0xFF1976DF)
             ),
             border = BorderStroke(2.dp, Color(0xFF1976DF)),
@@ -196,7 +198,7 @@ class AuthScreen:Screen{
     fun ButtonRegister() {
         Button(modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFF344CC1),
+                containerColor = Color(0xFF344CC1),
                 contentColor = Color.White
             ),
             onClick = {}
@@ -237,7 +239,7 @@ class AuthScreen:Screen{
     fun ButtonCreateNewAccount(onShowContentLoginChange: (Boolean) -> Unit) {
         OutlinedButton(modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.outlinedButtonColors(
-                backgroundColor = Color.Transparent,
+                containerColor = Color.Transparent,
                 contentColor = Color(0xFF344CC1),
             ),
             border = BorderStroke(2.dp, Color(0xFF344CC1)),
@@ -267,7 +269,7 @@ class AuthScreen:Screen{
         Button(
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFF2B425C),
+                containerColor = Color(0xFF2B425C),
                 contentColor = Color.White
             ), onClick = {}) {
             Text("INICIAR SESIÓN CON GOOGLE", fontWeight = FontWeight.Bold)
@@ -278,7 +280,7 @@ class AuthScreen:Screen{
     fun ButtonLogin(navigator: Navigator) {
         Button(modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFF1976DF),
+                containerColor = Color(0xFF1976DF),
                 contentColor = Color.White
             ),
             onClick = {
@@ -303,9 +305,10 @@ class AuthScreen:Screen{
                     fontWeight = FontWeight.ExtraLight
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color(0xFF464646),
-                backgroundColor = Color(0xFFE3E3E3),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF464646),
+                focusedContainerColor = Color(0xFFE3E3E3),
+                unfocusedContainerColor = Color(0xFFE3E3E3),
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
@@ -331,9 +334,10 @@ class AuthScreen:Screen{
                     fontWeight = FontWeight.ExtraLight
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color(0xFF464646),
-                backgroundColor = Color(0xFFE3E3E3),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF464646),
+                focusedContainerColor = Color(0xFFE3E3E3),
+                unfocusedContainerColor = Color(0xFFE3E3E3),
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
