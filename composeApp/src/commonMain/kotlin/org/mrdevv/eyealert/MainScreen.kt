@@ -2,6 +2,7 @@ package org.mrdevv.eyealert
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -57,8 +58,8 @@ class MainScreen : Screen {
                         modifier = Modifier
                             .shadow(
                                 elevation = 4.dp,
-                                ambientColor = Color.Black.copy(alpha = 0.2f),
-                                spotColor = Color.Black.copy(alpha = 0.3f)
+                                ambientColor = Color.Black.copy(alpha = 0.8f),
+                                spotColor = Color.Black.copy(alpha = 0.9f)
                             ),
                         navigationIcon = {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
