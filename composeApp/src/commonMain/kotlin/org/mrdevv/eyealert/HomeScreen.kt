@@ -58,7 +58,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.russhwolf.settings.Settings
 
+
+private val settings: Settings = Settings()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +73,7 @@ fun HomeScreen() {
         Row {
             Text("Bienvenido", fontSize = 25.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(5.dp))
-            Text("Miguel", fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(settings.getString("NAME", ""), fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
         Spacer(Modifier.height(5.dp))
         Text(
@@ -140,7 +143,7 @@ fun HomeScreen() {
                             modifier = Modifier.size(50.dp)
                         )
                         Text(
-                            "RIESGO BAJO",
+                            "RIESGO ALTO",
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
@@ -175,7 +178,7 @@ fun HomeScreen() {
                             modifier = Modifier.size(50.dp)
                         )
                         Text(
-                            "RIESGO BAJO",
+                            "RIESGO ALTO",
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
