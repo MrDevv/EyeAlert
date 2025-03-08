@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import cafe.adriel.voyager.core.stack.popUntil
 import cafe.adriel.voyager.navigator.Navigator
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.launch
@@ -33,21 +34,25 @@ fun ButtonLogin(navigator: Navigator, email: String, password: String, authProvi
             contentColor = Color.White
         ),
         onClick = {
-            coroutineScope.launch {
-                authProvider.signIn(email, password) { userResponse ->
-                    println(userResponse?.code)
-                    println(userResponse?.userData)
+//            coroutineScope.launch {
+//                authProvider.signIn(email, password) { userResponse ->
+//                    println(userResponse?.code)
+//                    println(userResponse?.userData)
+//
+//                    if (userResponse?.code == 200 && userResponse.userData != null){
+//                        settings.putString("NAME", userResponse.userData.nombres)
+////                        navigator.push(MainScreen())
+//                        navigator.replaceAll(MainScreen())
+//                    }else if (userResponse?.code == 200 && userResponse.userData == null){
+//                        coroutineScope.launch {
+//                            snackbarHostState.showSnackbar("Credenciales incorrectas. Inténtalo de nuevo.")
+//                        }
+//                    }
+//                }
+//            }
 
-                    if (userResponse?.code == 200 && userResponse.userData != null){
-                        settings.putString("NAME", userResponse.userData.nombres)
-                        navigator.push(MainScreen())
-                    }else if (userResponse?.code == 200 && userResponse.userData == null){
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Credenciales incorrectas. Inténtalo de nuevo.")
-                        }
-                    }
-                }
-            }
+            navigator.replaceAll(MainScreen())
+
         }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("INICIAR SESIÓN", fontWeight = FontWeight.Bold)

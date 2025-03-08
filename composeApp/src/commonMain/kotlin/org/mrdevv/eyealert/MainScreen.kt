@@ -30,6 +30,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabDisposable
@@ -48,7 +50,7 @@ class MainScreen : Screen {
             tabDisposable = {
                 TabDisposable(
                     it,
-                    listOf(HomeTab, MyEvaluationsTab)
+                    listOf(HomeTab, MyEvaluationsTab, InformationDataTab, StatsTab)
                 )
             }
         ) {
@@ -216,7 +218,8 @@ class MainScreen : Screen {
                                     topStart = 10.dp,
                                     topEnd = 10.dp
                                 )
-                            ).background(
+                            )
+                            .background(
                                 brush = Brush.verticalGradient(
                                     colors = if (tabNavigator.current.key == StatsTab.key) listOf(
                                         Color(0xFF1976DF),
