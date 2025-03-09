@@ -24,7 +24,7 @@ class PreguntasImpl : IPreguntas {
                 print("Error en la api: ${e.message}")
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    onResponse(null) // Devolver null en caso de error
+                    onResponse(null)
                 }
             }
         }

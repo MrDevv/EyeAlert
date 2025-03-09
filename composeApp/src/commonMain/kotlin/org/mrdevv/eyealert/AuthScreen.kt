@@ -59,12 +59,6 @@ class AuthScreen:Screen{
         var showContentLogin by remember { mutableStateOf(true) }
         val navigator = LocalNavigator.currentOrThrow
 
-//        var listUsers by remember { mutableStateOf<List<UserData>>(emptyList()) }
-
-//        getUsers {
-//            listUsers = it
-//        }
-
         Column(
             Modifier.fillMaxSize()
                 .background(
@@ -73,21 +67,6 @@ class AuthScreen:Screen{
                     )
                 )
         ) {
-//                LazyColumn {
-//                    items(listUsers) { user ->
-//                        Card(
-//                            modifier = Modifier.padding(8.dp)
-//                        ){
-//                            Column(
-//                                modifier = Modifier.fillMaxWidth()
-//                                    .padding(12.dp)
-//                            ) {
-//                                Text(text = "ID: ${user.id}")
-//                                Text(text = "ID: ${user.nombres}")
-//                            }
-//                        }
-//                    }
-//                }
 
 //        CONTENEDOR LOGO APP
             Column(
