@@ -37,14 +37,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -81,7 +84,7 @@ import org.mrdevv.eyealert.ui.components.BoxErrorMessage
 public class NewEvaluation : Screen {
 
 
-    @OptIn(ExperimentalFoundationApi::class)
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -107,6 +110,9 @@ public class NewEvaluation : Screen {
             }
         }
 
+        var isBottomSheetVisible by remember { mutableStateOf(false) } // Estado del BottomSheet
+
+
         LaunchedEffect(Unit) {
 //            delay(3000)
             preguntasImpl.getListPreguntas { response ->
@@ -124,6 +130,34 @@ public class NewEvaluation : Screen {
                     errorMessage = "El servidor no se encuentra disponible en estos momentos"
                 }
                 println("preguntas ${listPreguntas}")
+            }
+        }
+
+        // BottomSheet
+        if (isBottomSheetVisible) {
+            println(isBottomSheetVisible)
+            ModalBottomSheet(
+                onDismissRequest = { isBottomSheetVisible = false },
+                sheetState = rememberModalBottomSheetState()
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Text("Detalles de la Evaluación", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Aquí puedes mostrar detalles adicionales sobre la evaluación.")
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = { isBottomSheetVisible = false },
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        ) {
+                            Text("Cerrar")
+                        }
+                    }
+                }
             }
         }
 
@@ -267,6 +301,8 @@ public class NewEvaluation : Screen {
                         ),
                         onClick = {
 //                            bottomSheetNavigator.show(LowRisk())
+                    isBottomSheetVisible = true // Al hacer clic, se muestra el BottomSheet
+
                         }
                     ) {
                         Text("Realizar evaluación")
