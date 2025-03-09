@@ -3,51 +3,32 @@ package org.mrdevv.eyealert.evaluation.presentation.screen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowCircleLeft
 import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardDoubleArrowLeft
-import androidx.compose.material.icons.filled.SubdirectoryArrowLeft
-import androidx.compose.material.icons.filled.WifiOff
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Man
+import androidx.compose.material.icons.filled.Woman
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -59,27 +40,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
-import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.mrdevv.eyealert.evaluation.data.PreguntasImpl
 import org.mrdevv.eyealert.evaluation.model.domain.Pregunta
+import org.mrdevv.eyealert.evaluation.presentation.component.FloatingButton
+import org.mrdevv.eyealert.evaluation.presentation.component.Header
 import org.mrdevv.eyealert.ui.components.BoxErrorMessage
+import org.mrdevv.eyealert.ui.components.Loader
+import kotlin.random.Random
 
 public class NewEvaluation : Screen {
 
@@ -87,22 +61,20 @@ public class NewEvaluation : Screen {
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-
-//        val bottomSheetNavigator = LocalBottomSheetNavigator.current
-
         val preguntasImpl = PreguntasImpl();
-
+        val navigator = LocalNavigator.currentOrThrow
         var listPreguntas by remember { mutableStateOf<List<Pregunta>>(emptyList()) }
+        var isLoading by remember { mutableStateOf(true) }
+        var errorMessage by remember { mutableStateOf<String?>(null) }
+
+
+        var modalHasVisible by remember { mutableStateOf(false) }
 
         val listState = rememberLazyListState()
 
-        val coroutineScope = rememberCoroutineScope() // Alcance de la corrutina
+        val coroutineScope = rememberCoroutineScope()
 
-        val buttonKey = "loadMoreButton" // ✅ Key única para el botón final
-        var isLoading by remember { mutableStateOf(true) } // ✅ Estado para controlar el loader
-
-        var errorMessage by remember { mutableStateOf<String?>(null) } // ✅ Estado para el mensaje de error
+        val buttonKey = "loadMoreButton"
 
         val showButton by remember {
             derivedStateOf {
@@ -112,14 +84,19 @@ public class NewEvaluation : Screen {
 
         var isBottomSheetVisible by remember { mutableStateOf(false) } // Estado del BottomSheet
 
+        LaunchedEffect(isBottomSheetVisible) {
+            if (modalHasVisible && !isBottomSheetVisible){
+                navigator.pop()
+            }
+        }
 
+//        Obtiene las preguntas del backend
         LaunchedEffect(Unit) {
 //            delay(3000)
             preguntasImpl.getListPreguntas { response ->
                 if (response != null) {
                     if (response?.code == 200) {
                         listPreguntas = response.data!!
-//                        errorMessage = null
                     } else if (response?.code == 500) {
                         errorMessage =
                             "Ocurrio un error al momento de cargar las preguntas. Intentelo más tarde :("
@@ -133,31 +110,14 @@ public class NewEvaluation : Screen {
             }
         }
 
-        // BottomSheet
+        // Modal respuesta evaluacion
         if (isBottomSheetVisible) {
-            println(isBottomSheetVisible)
-            ModalBottomSheet(
-                onDismissRequest = { isBottomSheetVisible = false },
-                sheetState = rememberModalBottomSheetState()
-            ) {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Column {
-                        Text("Detalles de la Evaluación", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Aquí puedes mostrar detalles adicionales sobre la evaluación.")
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = { isBottomSheetVisible = false },
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        ) {
-                            Text("Cerrar")
-                        }
-                    }
-                }
+            modalHasVisible = true
+            val randomNumber = Random.nextInt(0, 2)
+            if (randomNumber == 0){
+                LowRisk(navigator) { isBottomSheetVisible = it }
+            }else{
+                HighRisk(navigator) { isBottomSheetVisible = it }
             }
         }
 
@@ -166,60 +126,15 @@ public class NewEvaluation : Screen {
             state = listState
         ) {
 
-            if (errorMessage == null){
+            if (errorMessage == null) {
                 stickyHeader {
-                    Row(
-                        Modifier.fillMaxSize().background(Color.White).padding(8.dp),
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        IconButton(
-                            modifier = Modifier
-                                .clip(
-                                    RoundedCornerShape(
-                                        5.dp
-                                    )
-                                )
-                                .height(30.dp)
-                                .background(Color(0xFF224164)),
-                            content = {
-                                Icon(
-                                    Icons.Filled.KeyboardDoubleArrowLeft,
-                                    modifier = Modifier.size(50.dp),
-                                    contentDescription = "",
-                                    tint = Color.White
-                                )
-                            },
-                            onClick = {
-                                navigator.pop()
-                            }
-                        )
-
-                        Spacer(Modifier.width(30.dp))
-
-                        Text(
-                            text = "Nueva Evaluación",
-                            fontSize = 25.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                    }
-
+                    Header(navigator)
                 }
             }
 
             if (isLoading) {
                 item {
-                    Box(
-                        Modifier.fillMaxWidth()
-                            .height(400.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .size(50.dp),
-                            color = Color(0xFF224164)
-                        )
-                    }
+                    Loader(400)
                 }
             }
 
@@ -227,7 +142,6 @@ public class NewEvaluation : Screen {
                 itemsIndexed(listPreguntas) { index, pregunta ->
                     var selectedOption by rememberSaveable { mutableStateOf<String?>(null) } // Estado para la selección
                     var valueInput by remember { mutableStateOf("") }
-
 
                     Column(
                         modifier = Modifier.fillMaxWidth()
@@ -246,7 +160,24 @@ public class NewEvaluation : Screen {
                                         },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(text = respuesta.respuesta)
+                                        val respClean = respuesta.respuesta.trim()
+                                        if (respClean != "Masculino" && respClean != "Femenino"){
+                                            Text(text = respuesta.respuesta)
+                                        }
+                                        if (respClean == "Masculino"){
+                                            Icon(
+                                                modifier = Modifier.size(40.dp),
+                                                imageVector =  Icons.Default.Man,
+                                                tint = Color(0xFF224164),
+                                                contentDescription = "icon man")
+                                        }
+                                        if (respClean == "Femenino"){
+                                            Icon(
+                                                modifier = Modifier.size(40.dp),
+                                                imageVector =  Icons.Default.Woman,
+                                                tint = Color(0xFFA11AEA),
+                                                contentDescription = "icon man")
+                                        }
                                         RadioButton(
                                             selected = selectedOption == respuesta.respuesta,
                                             onClick = { selectedOption = respuesta.respuesta }
@@ -301,7 +232,7 @@ public class NewEvaluation : Screen {
                         ),
                         onClick = {
 //                            bottomSheetNavigator.show(LowRisk())
-                    isBottomSheetVisible = true // Al hacer clic, se muestra el BottomSheet
+                            isBottomSheetVisible = true // Al hacer clic, se muestra el BottomSheet
 
                         }
                     ) {
@@ -313,27 +244,7 @@ public class NewEvaluation : Screen {
         }
 
         if (showButton && listPreguntas.isNotEmpty()) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                FloatingActionButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            println(listPreguntas.size)
-                            listState.animateScrollToItem(listPreguntas.lastIndex)
-                        }
-                    },
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .align(Alignment.BottomEnd),
-                    containerColor = Color(0xFF224164)
-                ) {
-                    Icon(
-                        Icons.Default.ArrowDownward,
-                        contentDescription = "Ir abajo",
-                        tint = Color.White
-                    )
-                }
-            }
-
+            FloatingButton(listPreguntas, listState, coroutineScope)
         }
 
     }

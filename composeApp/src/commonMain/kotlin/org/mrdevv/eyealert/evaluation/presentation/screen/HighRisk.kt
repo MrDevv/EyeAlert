@@ -25,12 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LowRisk(navigator: Navigator, isBottomSheetVisible: (Boolean) -> Unit) {
+fun HighRisk(navigator: Navigator, isBottomSheetVisible: (Boolean) -> Unit) {
     ModalBottomSheet(
         onDismissRequest = { isBottomSheetVisible(false) },
         sheetState = rememberModalBottomSheetState(),
@@ -40,19 +39,19 @@ fun LowRisk(navigator: Navigator, isBottomSheetVisible: (Boolean) -> Unit) {
         dragHandle = {
             Box(
                 Modifier
-                .fillMaxWidth()
-                .height(30.dp)
-                .background(Color(0xFF0C6D40)),
+                    .fillMaxWidth()
+                    .height(30.dp)
+                    .background(Color(0xFFCC3724)),
                 contentAlignment = Alignment.Center
             ){
                 Spacer(
                     Modifier
-                    .width(50.dp)
-                    .height(8.dp)
-                    .clip(
-                        RoundedCornerShape(4.dp)
-                    )
-                    .background(Color.White)
+                        .width(50.dp)
+                        .height(8.dp)
+                        .clip(
+                            RoundedCornerShape(4.dp)
+                        )
+                        .background(Color.White)
                 )
             }
         }
@@ -60,7 +59,7 @@ fun LowRisk(navigator: Navigator, isBottomSheetVisible: (Boolean) -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF0C6D40))
+                .background(Color(0xFFCC3724))
                 .padding(bottom = 5.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -82,15 +81,15 @@ fun LowRisk(navigator: Navigator, isBottomSheetVisible: (Boolean) -> Unit) {
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    "RIESGO BAJO",
+                    "RIESGO ALTO",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF0C6D40)
+                    color = Color(0xFFCC3724)
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Column(Modifier.fillMaxWidth().background(Color(0xFFEEEEEE)).padding(top = 20.dp)) {
                     Text(
-                        "Mantén tu estilo de vida saludable y realiza controles periódicos",
+                        "Consulta con un especialista para un examen ocular completo.",
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center
                     )
