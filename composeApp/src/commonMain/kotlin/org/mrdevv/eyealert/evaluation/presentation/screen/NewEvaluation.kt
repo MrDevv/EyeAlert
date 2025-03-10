@@ -95,7 +95,7 @@ public class NewEvaluation : Screen {
 //            delay(3000)
             preguntasImpl.getListPreguntas { response ->
                 if (response != null) {
-                    if (response?.code == 200) {
+                    if (response.code == 200) {
                         listPreguntas = response.data!!
                     } else if (response?.code == 500) {
                         errorMessage =

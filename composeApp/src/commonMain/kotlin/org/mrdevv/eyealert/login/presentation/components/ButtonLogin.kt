@@ -34,24 +34,25 @@ fun ButtonLogin(navigator: Navigator, email: String, password: String, authProvi
             contentColor = Color.White
         ),
         onClick = {
-//            coroutineScope.launch {
-//                authProvider.signIn(email, password) { userResponse ->
-//                    println(userResponse?.code)
-//                    println(userResponse?.userData)
-//
-//                    if (userResponse?.code == 200 && userResponse.userData != null){
-//                        settings.putString("NAME", userResponse.userData.nombres)
-////                        navigator.push(MainScreen())
-//                        navigator.replaceAll(MainScreen())
-//                    }else if (userResponse?.code == 200 && userResponse.userData == null){
-//                        coroutineScope.launch {
-//                            snackbarHostState.showSnackbar("Credenciales incorrectas. Inténtalo de nuevo.")
-//                        }
-//                    }
-//                }
-//            }
+            coroutineScope.launch {
+                authProvider.signIn(email, password) { userResponse ->
+                    println(userResponse?.code)
+                    println(userResponse?.userData)
+                    println(userResponse)
 
-            navigator.replaceAll(MainScreen())
+                    if (userResponse?.code == 200 && userResponse.userData != null){
+                        settings.putString("NAME", userResponse.userData.nombres)
+                        settings.putLong("ID", userResponse.userData.id)
+                        navigator.replaceAll(MainScreen())
+                    }else if (userResponse?.code == 200 && userResponse.userData == null){
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Credenciales incorrectas. Inténtalo de nuevo.")
+                        }
+                    }
+                }
+            }
+
+//            navigator.replaceAll(MainScreen())
 
         }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
