@@ -2,6 +2,7 @@ package org.mrdevv.eyealert.login.presentation.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -14,6 +15,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ButtonCreateNewAccount(onShowContentLoginChange: (Boolean) -> Unit) {
     OutlinedButton(modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(5.dp),
         colors = ButtonDefaults.outlinedButtonColors(
             containerColor = Color.Transparent,
             contentColor = Color(0xFF344CC1),

@@ -6,12 +6,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -161,14 +164,15 @@ class MainScreen : Screen {
                 },
                 bottomBar = {
                     NavigationBar(
-                        modifier = Modifier.height(65.dp),
                         containerColor = Color.White,
                         contentColor = Color(0xFF1976DF)
                     ) {
                         val tabNavigator: TabNavigator = LocalTabNavigator.current
 
+
                         NavigationBarItem(
                             selected = tabNavigator.current.key == HomeTab.key,
+
                             label = {
                                 Text(
                                     text = HomeTab.options.title,
@@ -209,6 +213,7 @@ class MainScreen : Screen {
                             label = { Text(MyEvaluationsTab.options.title, fontSize = 8.sp) },
                             icon = {
                                 Icon(
+                                    modifier = Modifier,
                                     painter = MyEvaluationsTab.options.icon!!,
                                     contentDescription = null
                                 )

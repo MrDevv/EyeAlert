@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,7 +31,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +45,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,12 +57,20 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.vectorResource
+import org.mrdevv.eyealert.InformativeData.data.DatoInformativoImpl
+import org.mrdevv.eyealert.InformativeData.model.domain.DatoInformativo
+import org.mrdevv.eyealert.InformativeData.presentation.component.ButtonMoreInformation
+import org.mrdevv.eyealert.InformativeData.presentation.component.ButtonVideo
+import org.mrdevv.eyealert.evaluation.presentation.screen.HighRisk
+import org.mrdevv.eyealert.evaluation.presentation.screen.LowRisk
 import org.mrdevv.eyealert.evaluation.presentation.screen.NewEvaluation
 import org.mrdevv.eyealert.home.data.EvaluacionImpl
 import org.mrdevv.eyealert.home.model.domain.Evaluacion
 import org.mrdevv.eyealert.ui.components.BoxErrorMessage
 import org.mrdevv.eyealert.ui.components.HeaderScreens
 import org.mrdevv.eyealert.ui.components.Loader
+import kotlin.random.Random
 
 
 private val settings: Settings = Settings()
@@ -65,14 +78,26 @@ private val settings: Settings = Settings()
 
 public class HomeScreen : Screen {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
         val evaluacionImpl = EvaluacionImpl()
+        val datoInformativoImpl = DatoInformativoImpl()
+
         var listLastEvaluations by remember { mutableStateOf<List<Evaluacion>>(emptyList()) }
+        var listThreeInformativeData by remember { mutableStateOf<List<DatoInformativo>>(emptyList()) }
+
         var errorMessage by remember { mutableStateOf<String?>(null) }
+        var errorMessageInformativeData by remember { mutableStateOf<String?>(null) }
+
         var isLoading by remember { mutableStateOf(true) }
+        var isLoadingInformativeData by remember { mutableStateOf(true) }
+
+        var selectedInformativeData by remember { mutableStateOf<DatoInformativo?>(null) }
+
+
 
         LaunchedEffect(Unit) {
 //                delay(4000)
@@ -91,8 +116,100 @@ public class HomeScreen : Screen {
                 }
                 isLoading = false;
             }
+
+            datoInformativoImpl.getTresDatosInformativosAleatorios { response ->
+                println(response)
+                if (response != null){
+                    if (response.code == 200) {
+                        if (response.data != null) {
+                            listThreeInformativeData = response.data
+                        }
+                    } else if (response.code == 500) {
+                        errorMessageInformativeData = "Ocurrio un error al momento de cargar los datos informativos. Intentelo más tarde :("
+                    }
+                }else {
+                    errorMessageInformativeData = "El servidor no se encuentra disponible en estos momentos"
+                }
+                isLoadingInformativeData = false;
+            }
         }
 
+
+
+        selectedInformativeData?.let { data ->
+            ModalBottomSheet(
+                onDismissRequest = { selectedInformativeData = null },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+                contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
+                dragHandle = {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(30.dp)
+                            .background(Color(0xFF6DB2FF)),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Spacer(
+                            Modifier
+                                .width(50.dp)
+                                .height(8.dp)
+                                .clip(
+                                    RoundedCornerShape(4.dp)
+                                )
+                                .background(Color.White)
+                        )
+                    }
+                }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF6DB2FF))
+                        .padding(bottom = 10.dp, start = 15.dp)
+                ){
+                    Text(
+                        "¿Sabías qué...?",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                ) {
+                    Column(
+                        Modifier.padding(20.dp)
+                    ) {
+                        Text(text = data.descripcion)
+
+                        Spacer(modifier = Modifier.height(50.dp))
+
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            Icon(
+                                modifier =  Modifier.size(120.dp),
+                                imageVector =  Icons.Default.Lightbulb,
+                                contentDescription = "icon led informative data",
+                                tint = Color(0xFFC1CA3D))
+                        }
+
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column {
+                                if (data.fuenteMultimedia.isNotEmpty()){
+                                    ButtonVideo(data.fuenteMultimedia)
+                                }
+                            }
+                            ButtonMoreInformation(data.fuente)
+                        }
+
+                        Spacer(modifier = Modifier.height(50.dp))
+                    }
+                }
+            }
+        }
 
         Column(
             Modifier.fillMaxSize().padding(top = 10.dp, start = 10.dp, end = 10.dp)
@@ -244,19 +361,13 @@ public class HomeScreen : Screen {
                     Text("SABIAS QUE...", color = Color.White, fontWeight = FontWeight.Bold)
                 }
 
-                val items = listOf(
-                    "Las personas mayores de 60 años corren mayor riesgo de tener glaucoma...",
-                    "La pérdida de visión por causa del glaucoma es permanente...",
-                    "El historial familiar es un factor importante del glaucoma..."
-                )
-
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(items.size) { index ->
+                    items(listThreeInformativeData) { infomativeData ->
                         Card(
                             modifier = Modifier
                                 .width(250.dp)
@@ -264,7 +375,10 @@ public class HomeScreen : Screen {
                             colors = CardDefaults.cardColors(
                                 containerColor = Color(0xFF6DB2FF)
                             ),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            onClick = {
+                                selectedInformativeData = infomativeData
+                            }
                         ) {
                             Box(
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -276,7 +390,7 @@ public class HomeScreen : Screen {
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = items[index],
+                                            text = limitText(infomativeData.descripcion, 12),
                                             fontSize = 14.sp,
                                             textAlign = TextAlign.Center
                                         )
@@ -297,6 +411,15 @@ public class HomeScreen : Screen {
 
             Spacer(Modifier.height(10.dp))
 
+        }
+    }
+
+    fun limitText(text: String, limit: Int): String {
+        val words = text.split(" ")
+        return if (words.size > limit) {
+            words.take(limit).joinToString(" ") + "..."
+        } else {
+            text
         }
     }
 }

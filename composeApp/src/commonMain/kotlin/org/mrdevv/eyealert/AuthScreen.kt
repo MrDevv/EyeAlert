@@ -70,7 +70,7 @@ class AuthScreen:Screen{
 
 //        CONTENEDOR LOGO APP
             Column(
-                Modifier.fillMaxWidth().weight(1f),
+                Modifier.fillMaxWidth().weight(1f).weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -92,6 +92,7 @@ class AuthScreen:Screen{
                     )
                     .background(Color.White)
                     .padding(horizontal = 30.dp, vertical = 40.dp)
+                    .weight(2f)
             ) {
                 if (showContentLogin) {
                     FormLogin(navigator) { showContentLogin = it }
