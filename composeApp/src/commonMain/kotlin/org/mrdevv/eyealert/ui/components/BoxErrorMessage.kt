@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 
 @Composable
-fun BoxErrorMessage(errorMessage: String?, onNavigateBack: Navigator) {
+fun BoxErrorMessage(errorMessage: String?, heightIcon: Int) {
     Column(
         Modifier.fillMaxWidth()
             .padding(horizontal = 20.dp)
@@ -38,7 +38,7 @@ fun BoxErrorMessage(errorMessage: String?, onNavigateBack: Navigator) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            modifier = Modifier.size(100.dp),
+            modifier = Modifier.size(heightIcon.dp),
             imageVector = Icons.Default.WifiOff,
             contentDescription = "",
             tint = Color(0xFF224164)
@@ -47,21 +47,6 @@ fun BoxErrorMessage(errorMessage: String?, onNavigateBack: Navigator) {
             text = errorMessage!!,
             textAlign = TextAlign.Center
         )
-        Spacer(Modifier.height(20.dp))
-        TextButton(
-            modifier = Modifier.wrapContentHeight()
-                .wrapContentWidth(),
-            shape = RoundedCornerShape(5.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF224164),
-                contentColor = Color.White
-            ),
-            onClick = {
-                onNavigateBack.pop()
-            }
-        ) {
-            Text("Regresar al Inicio")
-        }
         Spacer(Modifier.height(20.dp))
     }
 

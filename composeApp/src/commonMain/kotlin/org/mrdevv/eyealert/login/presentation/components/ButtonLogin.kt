@@ -36,9 +36,9 @@ fun ButtonLogin(navigator: Navigator, email: String, password: String, authProvi
         onClick = {
             coroutineScope.launch {
                 authProvider.signIn(email, password) { userResponse ->
-                    println(userResponse?.code)
-                    println(userResponse?.userData)
-                    println(userResponse)
+//                    println(userResponse?.code)
+//                    println(userResponse?.userData)
+//                    println(userResponse)
 
                     if (userResponse?.code == 200 && userResponse.userData != null){
                         settings.putString("NAME", userResponse.userData.nombres)

@@ -13,15 +13,18 @@ import org.mrdevv.eyealert.home.model.usecase.IEvaluacion
 import org.mrdevv.eyealert.network.HttpClient
 import kotlin.math.log
 
-class EvaluacionImpl : IEvaluacion{
-    override fun getEvaluacionesByUser(idUser: Long, onResponse: (ResponseEvaluacionByUser?) -> Unit) {
+class EvaluacionImpl : IEvaluacion {
+    override fun getEvaluacionesByUser(
+        idUser: Long,
+        onResponse: (ResponseEvaluacionByUser?) -> Unit
+    ) {
         val url = "http://192.168.1.4:8080/api/v1/evaluaciones/$idUser"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = HttpClient.httpClient.get(url).body<ResponseEvaluacionByUser>()
                 onResponse(response)
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 print("Error en la api: ${e.message}")
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
@@ -41,8 +44,8 @@ class EvaluacionImpl : IEvaluacion{
             try {
                 val response = HttpClient.httpClient.get(url).body<ResponseEvaluacionByUser>()
                 onResponse(response)
-            }catch (e: Exception) {
-                print("Error en la api: ${e.message}")
+            } catch (e: Exception) {
+                println("Error en la api: ${e.message}")
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     onResponse(null)

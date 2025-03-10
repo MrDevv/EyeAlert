@@ -51,10 +51,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.russhwolf.settings.Settings
+import kotlinx.coroutines.delay
 import org.mrdevv.eyealert.evaluation.presentation.screen.NewEvaluation
 import org.mrdevv.eyealert.home.data.EvaluacionImpl
 import org.mrdevv.eyealert.home.model.domain.Evaluacion
+import org.mrdevv.eyealert.ui.components.BoxErrorMessage
 import org.mrdevv.eyealert.ui.components.HeaderScreens
+import org.mrdevv.eyealert.ui.components.Loader
 
 
 private val settings: Settings = Settings()
@@ -62,7 +65,6 @@ private val settings: Settings = Settings()
 
 public class HomeScreen : Screen {
 
-    @OptIn(ExperimentalMaterial3Api::class, InternalVoyagerApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -70,20 +72,24 @@ public class HomeScreen : Screen {
         val evaluacionImpl = EvaluacionImpl()
         var listLastEvaluations by remember { mutableStateOf<List<Evaluacion>>(emptyList()) }
         var errorMessage by remember { mutableStateOf<String?>(null) }
+        var isLoading by remember { mutableStateOf(true) }
 
         LaunchedEffect(Unit) {
+//                delay(4000)
             evaluacionImpl.getLastEvaluacionesByUser(settings.getLong("ID", 0)) { response ->
                 if (response != null) {
                     if (response.code == 200) {
-                        listLastEvaluations = response.data!!.evaluaciones
+                        if (response.data != null) {
+                            listLastEvaluations = response.data.evaluaciones
+                        }
                     } else if (response.code == 500) {
-                        "Ocurrio un error al momento de cargar las preguntas. Intentelo más tarde :("
+                        errorMessage =
+                            "Ocurrio un error al momento de cargar las preguntas. Intentelo más tarde :("
                     }
-                    println("lista de evaluaciones: $listLastEvaluations")
                 } else {
                     errorMessage = "El servidor no se encuentra disponible en estos momentos"
-                    println(errorMessage)
                 }
+                isLoading = false;
             }
         }
 
@@ -109,156 +115,98 @@ public class HomeScreen : Screen {
                 }
                 //            ULTIMAS EVALUACIONES
                 Column(Modifier.fillMaxWidth().padding(10.dp)) {
+
+                    if (isLoading) {
+                        Loader(60)
+                    }
+
 //                CARD EVALUACION
-                    LazyColumn {
-                        if (listLastEvaluations.isEmpty()) {
-                            item {
-                                Box(Modifier.fillMaxWidth().padding(top = 5.dp, bottom = 10.dp)) {
-                                    Text(
-                                        "Aún no tienes evaluaciones, realiza una presionando en el botón de abajo.",
-                                        textAlign = TextAlign.Center,
-                                        fontWeight = FontWeight.Light,
-                                        fontSize = 15.sp
-                                    )
-                                }
-                            }
-                        } else {
-                            items(listLastEvaluations) { evaluacion ->
-                                var colorBox: Int
-                                var textBox: String
-                                var iconBox: ImageVector = Icons.Default.QuestionMark
-
-                                if (evaluacion.resultado == "bajo") {
-                                    colorBox = 0xFF0C6D40.toInt()
-                                    textBox = "RIESGO BAJO"
-                                    iconBox = Icons.Filled.Mood
-                                } else {
-                                    colorBox = 0xFFCC3724.toInt()
-                                    textBox = "RIESGO ALTO"
-                                    iconBox = Icons.Filled.SentimentDissatisfied
-                                }
-
-                                Row(
-                                    Modifier.clip(RoundedCornerShape(3.dp)).fillMaxWidth()
-                                        .background(Color(colorBox)).padding(5.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Icon(
-                                            iconBox,
-                                            contentDescription = "icon evaluation",
-                                            tint = Color.White,
-                                            modifier = Modifier.size(50.dp)
-                                        )
+                    if (errorMessage.isNullOrEmpty() && !isLoading) {
+                        LazyColumn {
+                            if (listLastEvaluations.isEmpty()) {
+                                item {
+                                    Box(
+                                        Modifier.fillMaxWidth().padding(top = 5.dp, bottom = 10.dp)
+                                    ) {
                                         Text(
-                                            text = textBox,
-                                            color = Color.White,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 14.sp
+                                            "Aún no tienes evaluaciones, realiza una presionando en el botón de abajo.",
+                                            textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.Light,
+                                            fontSize = 15.sp
                                         )
                                     }
-                                    Column(horizontalAlignment = Alignment.End) {
-                                        Text(evaluacion.fecha, color = Color.White)
-                                        Spacer(Modifier.height(4.dp))
-                                        Row {
-                                            Text(
-                                                "Tiempo:",
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold
+                                }
+                            } else {
+                                items(listLastEvaluations) { evaluacion ->
+                                    var colorBox: Int
+                                    var textBox: String
+                                    var iconBox: ImageVector = Icons.Default.QuestionMark
+
+                                    if (evaluacion.resultado == "bajo") {
+                                        colorBox = 0xFF0C6D40.toInt()
+                                        textBox = "RIESGO BAJO"
+                                        iconBox = Icons.Filled.Mood
+                                    } else {
+                                        colorBox = 0xFFCC3724.toInt()
+                                        textBox = "RIESGO ALTO"
+                                        iconBox = Icons.Filled.SentimentDissatisfied
+                                    }
+
+                                    Row(
+                                        Modifier.clip(RoundedCornerShape(3.dp)).fillMaxWidth()
+                                            .background(Color(colorBox)).padding(5.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            Icon(
+                                                iconBox,
+                                                contentDescription = "icon evaluation",
+                                                tint = Color.White,
+                                                modifier = Modifier.size(50.dp)
                                             )
-                                            Spacer(Modifier.width(5.dp))
                                             Text(
-                                                "${evaluacion.tiempoPredicion} segundos",
-                                                fontSize = 12.sp,
-                                                color = Color.White
+                                                text = textBox,
+                                                color = Color.White,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 14.sp
                                             )
                                         }
-                                        Spacer(Modifier.height(4.dp))
-                                        Icon(
-                                            Icons.Filled.PostAdd,
-                                            contentDescription = null,
-                                            tint = Color.White
-                                        )
+                                        Column(horizontalAlignment = Alignment.End) {
+                                            Text(evaluacion.fecha, color = Color.White)
+                                            Spacer(Modifier.height(4.dp))
+                                            Row {
+                                                Text(
+                                                    "Tiempo:",
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                                Spacer(Modifier.width(5.dp))
+                                                Text(
+                                                    "${evaluacion.tiempoPredicion} segundos",
+                                                    fontSize = 12.sp,
+                                                    color = Color.White
+                                                )
+                                            }
+                                            Spacer(Modifier.height(4.dp))
+                                            Icon(
+                                                Icons.Filled.PostAdd,
+                                                contentDescription = null,
+                                                tint = Color.White
+                                            )
+                                        }
                                     }
+
+                                    Spacer(Modifier.height(5.dp))
+
                                 }
-
-                                Spacer(Modifier.height(5.dp))
-
                             }
                         }
                     }
 
-
-//                     Row(
-//                         Modifier.clip(RoundedCornerShape(3.dp)).fillMaxWidth()
-//                             .background(Color(0xFFCC3724)).padding(5.dp),
-//                         horizontalArrangement = Arrangement.SpaceBetween,
-//                         verticalAlignment = Alignment.CenterVertically
-//                     ) {
-//                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                             Icon(
-//                                 Icons.Filled.SentimentDissatisfied,
-//                                 contentDescription = "icon evaluation",
-//                                 tint = Color.White,
-//                                 modifier = Modifier.size(50.dp)
-//                             )
-//                             Text(
-//                                 "RIESGO ALTO",
-//                                 color = Color.White,
-//                                 fontWeight = FontWeight.Bold,
-//                                 fontSize = 14.sp
-//                             )
-//                         }
-//                         Column(horizontalAlignment = Alignment.End) {
-//                             Text("5/12/2024", color = Color.White)
-//                             Spacer(Modifier.height(4.dp))
-//                             Row {
-//                                 Text("Tiempo:", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-//                                 Spacer(Modifier.width(5.dp))
-//                                 Text("2 segundos", fontSize = 12.sp, color = Color.White)
-//                             }
-//                             Spacer(Modifier.height(4.dp))
-//                             Icon(Icons.Filled.PostAdd, contentDescription = null, tint = Color.White)
-//                         }
-//                     }
-//
-//                     Spacer(Modifier.height(5.dp))
-//
-//                     Row(
-//                         Modifier.clip(RoundedCornerShape(3.dp)).fillMaxWidth()
-//                             .background(Color(0xFFCC3724)).padding(5.dp),
-//                         horizontalArrangement = Arrangement.SpaceBetween,
-//                         verticalAlignment = Alignment.CenterVertically
-//                     ) {
-//                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                             Icon(
-//                                 Icons.Filled.SentimentDissatisfied,
-//                                 contentDescription = "icon evaluation",
-//                                 tint = Color.White,
-//                                 modifier = Modifier.size(50.dp)
-//                             )
-//                             Text(
-//                                 "RIESGO ALTO",
-//                                 color = Color.White,
-//                                 fontWeight = FontWeight.Bold,
-//                                 fontSize = 14.sp
-//                             )
-//                         }
-//                         Column(horizontalAlignment = Alignment.End) {
-//                             Text("5/12/2024", color = Color.White)
-//                             Spacer(Modifier.height(4.dp))
-//                             Row {
-//                                 Text("Tiempo:", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-//                                 Spacer(Modifier.width(5.dp))
-//                                 Text("2 segundos", fontSize = 12.sp, color = Color.White)
-//                             }
-//                             Spacer(Modifier.height(4.dp))
-//                             Icon(Icons.Filled.PostAdd, contentDescription = null, tint = Color.White)
-//                         }
-//                     }
-//
-//                     Spacer(Modifier.height(5.dp))
+                    if (errorMessage != null && !isLoading) {
+                        BoxErrorMessage(errorMessage, 50)
+                    }
 
                     Button(
                         modifier = Modifier.wrapContentHeight().fillMaxWidth(),
