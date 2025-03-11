@@ -45,32 +45,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.russhwolf.settings.Settings
-import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.vectorResource
 import org.mrdevv.eyealert.InformativeData.data.DatoInformativoImpl
 import org.mrdevv.eyealert.InformativeData.model.domain.DatoInformativo
 import org.mrdevv.eyealert.InformativeData.presentation.component.ButtonMoreInformation
 import org.mrdevv.eyealert.InformativeData.presentation.component.ButtonVideo
-import org.mrdevv.eyealert.evaluation.presentation.screen.HighRisk
-import org.mrdevv.eyealert.evaluation.presentation.screen.LowRisk
 import org.mrdevv.eyealert.evaluation.presentation.screen.NewEvaluation
-import org.mrdevv.eyealert.home.data.EvaluacionImpl
-import org.mrdevv.eyealert.home.model.domain.Evaluacion
+import org.mrdevv.eyealert.evaluation.data.EvaluacionImpl
+import org.mrdevv.eyealert.evaluation.model.domain.Evaluacion
 import org.mrdevv.eyealert.ui.components.BoxErrorMessage
 import org.mrdevv.eyealert.ui.components.HeaderScreens
 import org.mrdevv.eyealert.ui.components.Loader
-import kotlin.random.Random
 
 
 private val settings: Settings = Settings()
@@ -109,7 +101,7 @@ public class HomeScreen : Screen {
                         }
                     } else if (response.code == 500) {
                         errorMessage =
-                            "Ocurrio un error al momento de cargar las preguntas. Intentelo más tarde :("
+                            "Ocurrio un error al momento de cargar las ultimas evaluaciones. Intentelo más tarde :("
                     }
                 } else {
                     errorMessage = "El servidor no se encuentra disponible en estos momentos"
@@ -259,6 +251,8 @@ public class HomeScreen : Screen {
                                     var textBox: String
                                     var iconBox: ImageVector = Icons.Default.QuestionMark
 
+                                    var fechaFormat = evaluacion.fecha.split(" ")[0]
+
                                     if (evaluacion.resultado == "bajo") {
                                         colorBox = 0xFF0C6D40.toInt()
                                         textBox = "RIESGO BAJO"
@@ -270,7 +264,7 @@ public class HomeScreen : Screen {
                                     }
 
                                     Row(
-                                        Modifier.clip(RoundedCornerShape(3.dp)).fillMaxWidth()
+                                        Modifier.clip(RoundedCornerShape(6.dp)).fillMaxWidth()
                                             .background(Color(colorBox)).padding(5.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
@@ -290,7 +284,7 @@ public class HomeScreen : Screen {
                                             )
                                         }
                                         Column(horizontalAlignment = Alignment.End) {
-                                            Text(evaluacion.fecha, color = Color.White)
+                                            Text(fechaFormat, color = Color.White)
                                             Spacer(Modifier.height(4.dp))
                                             Row {
                                                 Text(
@@ -361,52 +355,61 @@ public class HomeScreen : Screen {
                     Text("SABIAS QUE...", color = Color.White, fontWeight = FontWeight.Bold)
                 }
 
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(listThreeInformativeData) { infomativeData ->
-                        Card(
-                            modifier = Modifier
-                                .width(250.dp)
-                                .height(110.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFF6DB2FF)
-                            ),
-                            shape = RoundedCornerShape(8.dp),
-                            onClick = {
-                                selectedInformativeData = infomativeData
-                            }
-                        ) {
-                            Box(
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                contentAlignment = Alignment.Center
+                if (isLoadingInformativeData) {
+                    Loader(60)
+                }
+
+                if (errorMessageInformativeData.isNullOrEmpty() && !isLoadingInformativeData) {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(listThreeInformativeData) { infomativeData ->
+                            Card(
+                                modifier = Modifier
+                                    .width(250.dp)
+                                    .height(110.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color(0xFF6DB2FF)
+                                ),
+                                shape = RoundedCornerShape(8.dp),
+                                onClick = {
+                                    selectedInformativeData = infomativeData
+                                }
                             ) {
-                                Column(horizontalAlignment = Alignment.Start) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth().weight(2.6f),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = limitText(infomativeData.descripcion, 12),
-                                            fontSize = 14.sp,
-                                            textAlign = TextAlign.Center
+                                Box(
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.Start) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth().weight(2.6f),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = limitText(infomativeData.descripcion, 12),
+                                                fontSize = 14.sp,
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
+                                        Icon(
+                                            imageVector = Icons.Default.Lightbulb,
+                                            contentDescription = null,
+                                            tint = Color(0xFFB2FF59),
+                                            modifier = Modifier.size(32.dp).weight(1f)
                                         )
                                     }
-                                    Icon(
-                                        imageVector = Icons.Default.Lightbulb,
-                                        contentDescription = null,
-                                        tint = Color(0xFFB2FF59),
-                                        modifier = Modifier.size(32.dp).weight(1f)
-                                    )
                                 }
                             }
                         }
                     }
                 }
 
+                if (errorMessageInformativeData != null && !isLoadingInformativeData) {
+                    BoxErrorMessage(errorMessageInformativeData, 50)
+                }
             }
 
             Spacer(Modifier.height(10.dp))

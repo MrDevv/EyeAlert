@@ -3,6 +3,7 @@ package org.mrdevv.eyealert
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -165,7 +167,12 @@ class MainScreen : Screen {
                 bottomBar = {
                     NavigationBar(
                         containerColor = Color.White,
-                        contentColor = Color(0xFF1976DF)
+                        contentColor = Color(0xFF1976DF),
+                        modifier = Modifier.shadow(
+                            elevation = 16.dp,
+                            ambientColor = Color.Black,
+                            spotColor = Color.Black
+                        )
                     ) {
                         val tabNavigator: TabNavigator = LocalTabNavigator.current
 

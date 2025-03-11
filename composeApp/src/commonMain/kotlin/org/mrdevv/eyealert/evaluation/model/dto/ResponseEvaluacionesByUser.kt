@@ -1,8 +1,8 @@
-package org.mrdevv.eyealert.home.model.dto
+package org.mrdevv.eyealert.evaluation.model.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.mrdevv.eyealert.home.model.domain.Evaluacion
+import org.mrdevv.eyealert.evaluation.model.domain.Evaluacion
 
 @Serializable
 data class ResponseEvaluacionByUser (

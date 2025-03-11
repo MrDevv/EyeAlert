@@ -30,7 +30,7 @@ import org.mrdevv.eyealert.ui.components.Loader
 private val settings: Settings = Settings()
 
 @Composable
-fun ButtonLogin(navigator: Navigator, email: String, password: String, authProvider: AuthProvider) {
+fun ButtonLogin(navigator: Navigator, email: String, password: String, authProvider: AuthProvider, hideKeyBoard: () -> Unit) {
 
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -45,13 +45,6 @@ fun ButtonLogin(navigator: Navigator, email: String, password: String, authProvi
         isEnableButton = false
     }
 
-
-//    if (email.isNotEmpty() && password.isNotEmpty()){
-//        handlerEnableButton(true)
-//    }else{
-//        handlerEnableButton(false)
-//    }
-
     if (isLoading){
         Loader(50)
     }else{
@@ -65,6 +58,7 @@ fun ButtonLogin(navigator: Navigator, email: String, password: String, authProvi
 //            enabled = isEnableButtonValue,
             enabled = isEnableButton,
             onClick = {
+                hideKeyBoard()
                 isLoading = true
                 coroutineScope.launch {
                     authProvider.signIn(email, password) { userResponse ->

@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +26,8 @@ fun FormLogin(navigator: Navigator, onShowContentLoginChange: (Boolean) -> Unit)
 
     val authProvider = AuthProviderImpl()
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Text("INICIAR SESIÓN", fontSize = 20.sp, fontWeight = FontWeight.Bold)
     Spacer(Modifier.height(5.dp))
     Text("Por favor inicia sesión para continuar.")
@@ -33,7 +36,9 @@ fun FormLogin(navigator: Navigator, onShowContentLoginChange: (Boolean) -> Unit)
     Spacer(Modifier.height(5.dp))
     Password(password) { password = it }
     Spacer(Modifier.height(10.dp))
-    ButtonLogin(navigator, email, password, authProvider)
+    ButtonLogin(navigator, email, password, authProvider){
+        keyboardController?.hide()
+    }
     DividerFormsAuth()
     ButtonCreateNewAccount(onShowContentLoginChange)
 }

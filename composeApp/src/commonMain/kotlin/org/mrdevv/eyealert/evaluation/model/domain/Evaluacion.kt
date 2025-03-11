@@ -1,4 +1,4 @@
-package org.mrdevv.eyealert.home.model.domain
+package org.mrdevv.eyealert.evaluation.model.domain
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
