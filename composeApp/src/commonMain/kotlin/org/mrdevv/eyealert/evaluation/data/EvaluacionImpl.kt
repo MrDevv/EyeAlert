@@ -1,5 +1,6 @@
 package org.mrdevv.eyealert.evaluation.data
 
+import androidx.compose.runtime.Composable
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.CoroutineScope
@@ -7,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.mrdevv.eyealert.evaluation.model.dto.ResponseDetailEvaluacion
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseEvaluacionByUser
 import org.mrdevv.eyealert.evaluation.model.usecase.IEvaluacion
 import org.mrdevv.eyealert.network.HttpClient
@@ -61,6 +63,26 @@ class EvaluacionImpl : IEvaluacion {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = HttpClient.httpClient.get(url).body<ResponseEvaluacionByUser>()
+                onResponse(response)
+            } catch (e: Exception) {
+                println("Error en la api: ${e.message}")
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onResponse(null)
+                }
+            }
+        }
+    }
+
+    override fun getDetailEvaluacion(
+        idEvaluacion: Long,
+        onResponse: (ResponseDetailEvaluacion?) -> Unit
+    ) {
+        val url = "http://192.168.1.4:8080/api/v1/detalleEvaluacion/$idEvaluacion"
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = HttpClient.httpClient.get(url).body<ResponseDetailEvaluacion>()
                 onResponse(response)
             } catch (e: Exception) {
                 println("Error en la api: ${e.message}")

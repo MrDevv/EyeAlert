@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Evaluacion(
-    val id: Int,
+    val id: Long,
     val fecha: String,
     @SerialName("tiempo_prediccion")
     val tiempoPredicion: Int,
