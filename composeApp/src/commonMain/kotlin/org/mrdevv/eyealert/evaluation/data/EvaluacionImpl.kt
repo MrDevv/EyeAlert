@@ -3,13 +3,19 @@ package org.mrdevv.eyealert.evaluation.data
 import androidx.compose.runtime.Composable
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.mrdevv.eyealert.evaluation.model.dto.RequestRespuestasCuestionario
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseDetailEvaluacion
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseEvaluacionByUser
+import org.mrdevv.eyealert.evaluation.model.dto.ResponseNivelRiesgo
 import org.mrdevv.eyealert.evaluation.model.usecase.IEvaluacion
 import org.mrdevv.eyealert.network.HttpClient
 
@@ -84,6 +90,31 @@ class EvaluacionImpl : IEvaluacion {
             try {
                 val response = HttpClient.httpClient.get(url).body<ResponseDetailEvaluacion>()
                 onResponse(response)
+            } catch (e: Exception) {
+                println("Error en la api: ${e.message}")
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onResponse(null)
+                }
+            }
+        }
+    }
+
+    override fun getNivelRiesgoEvaluacion(
+        respuestasCuestionario: RequestRespuestasCuestionario,
+        onResponse: (ResponseNivelRiesgo?) -> Unit
+    ) {
+        val url = "http://192.168.1.4:4000/evaluation"
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = HttpClient.httpClient.post(url){
+                    contentType(ContentType.Application.Json)
+                    setBody(respuestasCuestionario)
+                }.body<ResponseNivelRiesgo>()
+
+                onResponse(response)
+
             } catch (e: Exception) {
                 println("Error en la api: ${e.message}")
                 e.printStackTrace()

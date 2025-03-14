@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -44,14 +46,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
+import org.mrdevv.eyealert.evaluation.data.EvaluacionImpl
 import org.mrdevv.eyealert.evaluation.data.PreguntasImpl
 import org.mrdevv.eyealert.evaluation.model.domain.Pregunta
+import org.mrdevv.eyealert.evaluation.model.dto.RequestRespuestasCuestionario
 import org.mrdevv.eyealert.evaluation.presentation.component.FloatingButton
 import org.mrdevv.eyealert.evaluation.presentation.component.Header
 import org.mrdevv.eyealert.ui.components.BoxErrorMessage
@@ -64,7 +70,13 @@ public class NewEvaluation : Screen {
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        val keyboardController = LocalSoftwareKeyboardController.current
+
         val preguntasImpl = PreguntasImpl();
+        val evaluacionImpl = EvaluacionImpl()
+
+        val respuestasUsuario = remember { mutableStateMapOf<Long, String>() }
+
         val navigator = LocalNavigator.currentOrThrow
         var listPreguntas by remember { mutableStateOf<List<Pregunta>>(emptyList()) }
         var isLoading by remember { mutableStateOf(true) }
@@ -72,7 +84,8 @@ public class NewEvaluation : Screen {
 
 
         var modalHasVisible by remember { mutableStateOf(false) }
-
+        var textResultEvaluacion by remember { mutableStateOf<String?>(null) }
+        var isEnableButton by remember { mutableStateOf(false) }
         val listState = rememberLazyListState()
 
         val coroutineScope = rememberCoroutineScope()
@@ -116,8 +129,8 @@ public class NewEvaluation : Screen {
         // Modal respuesta evaluacion
         if (isBottomSheetVisible) {
             modalHasVisible = true
-            val randomNumber = Random.nextInt(0, 2)
-            if (randomNumber == 0){
+//            val randomNumber = Random.nextInt(0, 2)
+            if (textResultEvaluacion?.contains("bajo") == true){
                 LowRisk(navigator) { isBottomSheetVisible = it }
             }else{
                 HighRisk(navigator) { isBottomSheetVisible = it }
@@ -144,13 +157,18 @@ public class NewEvaluation : Screen {
             if (errorMessage.isNullOrEmpty()) {
                 itemsIndexed(listPreguntas) { index, pregunta ->
                     var selectedOption by rememberSaveable { mutableStateOf<String?>(null) } // Estado para la selección
-                    var valueInput by remember { mutableStateOf("") }
 
                     Column(
                         modifier = Modifier.fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 12.dp)
                     ) {
-                        Text(text = "${index + 1}. ${pregunta.descripcion}", color = Color.Black)
+                        Row(Modifier.fillMaxWidth()) {
+                            Text(text = "${index + 1}. ${pregunta.descripcion}", color = Color.Black)
+                            if (pregunta.descripcion.contains("edad")){
+                                Spacer(Modifier.width(5.dp))
+                                Text("(mayor o igual de 40 años)", fontWeight =  FontWeight.Bold)
+                            }
+                        }
                         Row(
                             Modifier.fillMaxWidth().padding(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.SpaceAround
@@ -160,6 +178,7 @@ public class NewEvaluation : Screen {
                                     Row(
                                         Modifier.clickable {
                                             selectedOption = respuesta.respuesta
+                                            respuestasUsuario[pregunta.id] = respuesta.respuesta
                                         },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
@@ -183,7 +202,11 @@ public class NewEvaluation : Screen {
                                         }
                                         RadioButton(
                                             selected = selectedOption == respuesta.respuesta,
-                                            onClick = { selectedOption = respuesta.respuesta }
+                                            onClick = {
+                                                keyboardController?.hide()
+                                                selectedOption = respuesta.respuesta
+                                                respuestasUsuario[pregunta.id] = respuesta.respuesta
+                                            }
                                         )
                                     }
 
@@ -191,10 +214,13 @@ public class NewEvaluation : Screen {
                             } else {
                                 Column {
                                     TextField(
-                                        value = valueInput,
-                                        onValueChange = {
-                                            if (it.all { char -> char.isDigit() }) { // Filtra solo números
-                                                valueInput = it
+//                                        value = valueInput,
+                                        value = respuestasUsuario[pregunta.id] ?: "",
+                                        onValueChange = { input ->
+                                            if (input.all { char -> char.isDigit() }) { // Filtra solo números
+//                                                valueInput = it
+                                                    respuestasUsuario[pregunta.id] = input
+
                                             }
                                         },
                                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -236,6 +262,12 @@ public class NewEvaluation : Screen {
                 }
             }
 
+            if (listPreguntas.size == respuestasUsuario.size && !respuestasUsuario.values.any{ it.isEmpty()} && respuestasUsuario.values.any{ it.toIntOrNull()?: 0 >= 40 } ){
+                isEnableButton = true
+            }else{
+                isEnableButton = false
+            }
+
             if (listPreguntas.isNotEmpty()) {
                 item(
                     key = buttonKey
@@ -251,9 +283,66 @@ public class NewEvaluation : Screen {
                             containerColor = Color(0xFF224164),
                             contentColor = Color.White
                         ),
+                        enabled = isEnableButton,
                         onClick = {
 //                            bottomSheetNavigator.show(LowRisk())
-                            isBottomSheetVisible = true // Al hacer clic, se muestra el BottomSheet
+                            coroutineScope.launch {
+                                    println("respuestas del usuario: ${respuestasUsuario}")
+
+                                val edad: Int = respuestasUsuario[1]!!.toInt()
+                                val sexo = if(respuestasUsuario[2]!! == "Masculino"){
+                                    1
+                                }else{
+                                    0
+                                }
+                                val PIOEvelada = if(respuestasUsuario[3]!! == "Sí"){
+                                    1
+                                }else{
+                                    0
+                                }
+                                val historialFamiliar = if(respuestasUsuario[4]!! == "Sí"){
+                                    1
+                                }else{
+                                    0
+                                }
+                                val diabetes = if(respuestasUsuario[5]!! == "Sí"){
+                                    1
+                                }else{
+                                    0
+                                }
+                                val hipertension = if(respuestasUsuario[6]!! == "Sí"){
+                                    1
+                                }else{
+                                    0
+                                }
+                                val catarata = if(respuestasUsuario[7]!! == "Sí"){
+                                    1
+                                }else{
+                                    0
+                                }
+
+
+
+                                 val respuestasCuestionario = RequestRespuestasCuestionario(edad, sexo, PIOEvelada, historialFamiliar, diabetes, hipertension, catarata)
+                                evaluacionImpl.getNivelRiesgoEvaluacion(respuestasCuestionario) { response ->
+                                    if (response != null){
+                                        if (response.status == 200){
+                                            println(response)
+
+
+//                                            TODO: GUARDAR LA EVALUACION Y EL DETALLE EN EL BACKEND DE SPRINGBOOT
+
+                                            textResultEvaluacion = response.message
+                                            isBottomSheetVisible = true
+
+                                        }
+                                    }else{
+//                                        ASIGNAR VARIABLE ERROR
+                                    }
+                                }
+
+                            }
+//                            isBottomSheetVisible = true // Al hacer clic, se muestra el BottomSheet
 
                         }
                     ) {
