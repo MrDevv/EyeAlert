@@ -28,4 +28,21 @@ class DatoInformativoImpl : IDatoInformativo {
             }
         }
     }
+
+    override fun getAllDatosInformativos(onResponse: (ResponseDatosInformativos?) -> Unit) {
+        val url = "http://192.168.1.4:8080/api/v1/datosInformativos"
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = HttpClient.httpClient.get(url).body<ResponseDatosInformativos>()
+                onResponse(response)
+            } catch (e: Exception) {
+                print("Error en la api: ${e.message}")
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onResponse(null)
+                }
+            }
+        }
+    }
 }

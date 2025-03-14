@@ -6,4 +6,5 @@ interface IDatoInformativo {
 
     fun getTresDatosInformativosAleatorios(onResponse: (ResponseDatosInformativos?) -> Unit)
 
+    fun getAllDatosInformativos(onResponse: (ResponseDatosInformativos?) -> Unit)
 }
