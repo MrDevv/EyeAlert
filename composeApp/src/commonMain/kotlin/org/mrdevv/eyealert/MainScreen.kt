@@ -155,6 +155,7 @@ class MainScreen : Screen {
                                     },
                                     onClick = {
                                         navigator.replaceAll(AuthScreen())
+                                        settings.clear()
                                         println("cerrando sesión")
                                         expanded = false
                                     }
