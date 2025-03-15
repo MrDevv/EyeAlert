@@ -53,16 +53,24 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.get
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.mrdevv.eyealert.evaluation.data.EvaluacionImpl
 import org.mrdevv.eyealert.evaluation.data.PreguntasImpl
 import org.mrdevv.eyealert.evaluation.model.domain.Pregunta
+import org.mrdevv.eyealert.evaluation.model.dto.CrearDetalleEvaluacionDTO
+import org.mrdevv.eyealert.evaluation.model.dto.CrearEvaluacionDTO
 import org.mrdevv.eyealert.evaluation.model.dto.RequestRespuestasCuestionario
 import org.mrdevv.eyealert.evaluation.presentation.component.FloatingButton
+import org.mrdevv.eyealert.evaluation.presentation.component.FloatingLoader
 import org.mrdevv.eyealert.evaluation.presentation.component.Header
 import org.mrdevv.eyealert.ui.components.BoxErrorMessage
 import org.mrdevv.eyealert.ui.components.Loader
 import kotlin.random.Random
+
+private val settings: Settings = Settings()
 
 public class NewEvaluation : Screen {
 
@@ -82,6 +90,11 @@ public class NewEvaluation : Screen {
         var isLoading by remember { mutableStateOf(true) }
         var errorMessage by remember { mutableStateOf<String?>(null) }
 
+
+        var errorMessageCreateEvaluation by remember { mutableStateOf<String?>(null) }
+        var errorMessageModelAPI by remember { mutableStateOf<String?>(null) }
+
+        var isLoadingEvaluation by remember { mutableStateOf(false) }
 
         var modalHasVisible by remember { mutableStateOf(false) }
         var textResultEvaluacion by remember { mutableStateOf<String?>(null) }
@@ -122,8 +135,11 @@ public class NewEvaluation : Screen {
                     isLoading = false
                     errorMessage = "El servidor no se encuentra disponible en estos momentos"
                 }
-                println("preguntas ${listPreguntas}")
             }
+        }
+
+        if (isLoadingEvaluation) {
+            FloatingLoader()
         }
 
         // Modal respuesta evaluacion
@@ -272,7 +288,6 @@ public class NewEvaluation : Screen {
                 item(
                     key = buttonKey
                 ) {
-                    println(errorMessage)
 
                     TextButton(
                         modifier = Modifier.wrapContentHeight()
@@ -285,10 +300,8 @@ public class NewEvaluation : Screen {
                         ),
                         enabled = isEnableButton,
                         onClick = {
-//                            bottomSheetNavigator.show(LowRisk())
+                            isLoadingEvaluation = true
                             coroutineScope.launch {
-                                    println("respuestas del usuario: ${respuestasUsuario}")
-
                                 val edad: Int = respuestasUsuario[1]!!.toInt()
                                 val sexo = if(respuestasUsuario[2]!! == "Masculino"){
                                     1
@@ -327,23 +340,88 @@ public class NewEvaluation : Screen {
                                 evaluacionImpl.getNivelRiesgoEvaluacion(respuestasCuestionario) { response ->
                                     if (response != null){
                                         if (response.status == 200){
-                                            println(response)
+                                            val tiempoPrediccion = response.predictionTimeMs
+                                            val resultado = response.resultEvaluation.toInt()
+                                            val usuarioId = settings.getLong("ID", 0)
+
+                                            var detalleEvaluacion: MutableList<CrearDetalleEvaluacionDTO> = mutableListOf()
 
 
-//                                            TODO: GUARDAR LA EVALUACION Y EL DETALLE EN EL BACKEND DE SPRINGBOOT
+                                            var idRespuestaSi : Long = 0
+                                            var idRespuestaNo : Long = 0
+                                            var idRespuestaMasculino: Long = 0
+                                            var idRespuestaFemenino: Long = 0
 
-                                            textResultEvaluacion = response.message
-                                            isBottomSheetVisible = true
+                                            listPreguntas.forEach { pregunta ->
+                                                pregunta.listRespuestas.forEach { pregunta ->
+                                                    if (pregunta.respuesta == "Sí"){
+                                                        idRespuestaSi =pregunta.id
+                                                    }
 
+                                                    if (pregunta.respuesta == "No"){
+                                                        idRespuestaNo =pregunta.id
+                                                    }
+
+                                                    if (pregunta.respuesta == "Masculino"){
+                                                        idRespuestaMasculino =pregunta.id
+                                                    }
+
+                                                    if (pregunta.respuesta == "Femenino"){
+                                                        idRespuestaFemenino =pregunta.id
+                                                    }
+                                                }
+                                            }
+
+                                            respuestasUsuario.forEach { respuesta ->
+                                                var respuestaId : Long? = null
+
+                                                var respuestaTexto: String = ""
+
+                                                if (respuesta.value == "Sí"){
+                                                    respuestaId = idRespuestaSi
+                                                }
+
+                                                if (respuesta.value == "No"){
+                                                    respuestaId = idRespuestaNo
+                                                }
+
+                                                if (respuesta.value == "Masculino"){
+                                                    respuestaId = idRespuestaMasculino
+                                                }
+
+                                                if (respuesta.value == "Femenino"){
+                                                    respuestaId = idRespuestaFemenino
+                                                }
+
+                                                if(respuesta.value != "Femenino" && respuesta.value != "Masculino" && respuesta.value != "Sí" && respuesta.value != "No"){
+                                                    respuestaTexto = respuesta.value
+                                                }
+
+                                                var crearDetalleEvaluacionDTO = CrearDetalleEvaluacionDTO(respuesta.key, respuestaId, respuestaTexto)
+                                                detalleEvaluacion.add(crearDetalleEvaluacionDTO)
+                                            }
+
+                                            evaluacionImpl.crearEvaluacion(CrearEvaluacionDTO(tiempoPrediccion, resultado, usuarioId, detalleEvaluacion)){ responseCreateEvaluation ->
+                                                if (responseCreateEvaluation != null) {
+                                                    if (responseCreateEvaluation.code == 201){
+                                                        textResultEvaluacion = response.message
+                                                        isBottomSheetVisible = true
+                                                    }else{
+                                                        errorMessageCreateEvaluation = "Ocurrió un error al momento de guardar la evaluación."
+                                                    }
+                                                }else{
+                                                    errorMessageCreateEvaluation = "El servidor no se encuentra disponible. Intentelo más tarde :("
+                                                }
+                                            }
+                                        }else{
+                                            errorMessageModelAPI = "Ocurrió un error al momento de realizar la evaluación."
                                         }
                                     }else{
-//                                        ASIGNAR VARIABLE ERROR
+                                        errorMessageModelAPI = "El servidor para realizar la evaluación no se encuentra disponible. Intentelo más tarde :("
                                     }
                                 }
-
+                                isLoadingEvaluation = false
                             }
-//                            isBottomSheetVisible = true // Al hacer clic, se muestra el BottomSheet
-
                         }
                     ) {
                         Text("Realizar evaluación")

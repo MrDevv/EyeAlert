@@ -8,6 +8,6 @@ data class Evaluacion(
     val id: Long,
     val fecha: String,
     @SerialName("tiempo_prediccion")
-    val tiempoPredicion: Int,
+    val tiempoPredicion: Double,
     val resultado: String
 )

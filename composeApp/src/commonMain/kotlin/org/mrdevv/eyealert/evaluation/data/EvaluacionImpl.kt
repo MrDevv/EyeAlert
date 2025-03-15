@@ -12,9 +12,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.mrdevv.eyealert.evaluation.model.dto.CrearEvaluacionDTO
 import org.mrdevv.eyealert.evaluation.model.dto.RequestRespuestasCuestionario
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseDetailEvaluacion
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseEvaluacionByUser
+import org.mrdevv.eyealert.evaluation.model.dto.ResponseEvaluacionDTO
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseNivelRiesgo
 import org.mrdevv.eyealert.evaluation.model.usecase.IEvaluacion
 import org.mrdevv.eyealert.network.HttpClient
@@ -124,4 +126,30 @@ class EvaluacionImpl : IEvaluacion {
             }
         }
     }
+
+    override fun crearEvaluacion(
+        evaluacionDTO: CrearEvaluacionDTO,
+        onResponse: (ResponseEvaluacionDTO?) -> Unit
+    ) {
+        val url = "http://192.168.1.4:8080/api/v1/evaluaciones"
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = HttpClient.httpClient.post(url){
+                    contentType(ContentType.Application.Json)
+                    setBody(evaluacionDTO)
+                }.body<ResponseEvaluacionDTO>()
+
+                onResponse(response)
+
+            } catch (e: Exception) {
+                println("Error en la api: ${e.message}")
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onResponse(null)
+                }
+            }
+        }
+    }
+
 }

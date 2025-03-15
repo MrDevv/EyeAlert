@@ -294,7 +294,7 @@ public class HomeScreen : Screen {
                                                 )
                                                 Spacer(Modifier.width(5.dp))
                                                 Text(
-                                                    "${evaluacion.tiempoPredicion} segundos",
+                                                    "${evaluacion.tiempoPredicion} ms",
                                                     fontSize = 12.sp,
                                                     color = Color.White
                                                 )

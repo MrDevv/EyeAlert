@@ -14,5 +14,7 @@ data class Pregunta(
 
 @Serializable
 data class Respuesta(
-    val respuesta: String
+    @SerialName("respuesta_id")
+    val id: Long,
+    var respuesta: String
 )
