@@ -7,13 +7,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.mrdevv.eyealert.InformativeData.model.domain.DatoInformativo
+import org.mrdevv.eyealert.InformativeData.model.dto.ResponseDatoInformativo
 import org.mrdevv.eyealert.InformativeData.model.dto.ResponseDatosInformativos
 import org.mrdevv.eyealert.InformativeData.model.usecase.IDatoInformativo
 import org.mrdevv.eyealert.network.HttpClient
 
 class DatoInformativoImpl : IDatoInformativo {
     override fun getTresDatosInformativosAleatorios(onResponse: (ResponseDatosInformativos?) -> Unit) {
-        val url = "http://192.168.1.4:8080/api/v1/datosInformativos/aleatorio"
+        val url = "http://192.168.1.4:8080/api/v1/datosInformativos/aleatorios"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -35,6 +37,23 @@ class DatoInformativoImpl : IDatoInformativo {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = HttpClient.httpClient.get(url).body<ResponseDatosInformativos>()
+                onResponse(response)
+            } catch (e: Exception) {
+                print("Error en la api: ${e.message}")
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onResponse(null)
+                }
+            }
+        }
+    }
+
+    override fun getDatoInformativoAleatorio(onResponse: (ResponseDatoInformativo?) -> Unit) {
+        val url = "http://192.168.1.4:8080/api/v1/datosInformativos/aleatorio"
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = HttpClient.httpClient.get(url).body<ResponseDatoInformativo>()
                 onResponse(response)
             } catch (e: Exception) {
                 print("Error en la api: ${e.message}")
