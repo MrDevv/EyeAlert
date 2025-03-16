@@ -265,22 +265,65 @@ class MyEvaluationsScreen() : Screen {
 
         LaunchedEffect(seleccion) {
 //            delay(4000)
-            evaluacionImpl.getLastWeekEvaluacionesByUser(settings.getLong("ID", 0)) { response ->
-                println("response: $response")
-                if (response != null) {
-                    if (response.code == 200) {
-                        if (response.data != null) {
-                            listEvaluations = response.data.evaluaciones
+            if (seleccion == "Todos"){
+                isLoading = true;
+                evaluacionImpl.getEvaluacionesByUser(settings.getLong("ID", 0)) { response ->
+                    if (response != null) {
+                        if (response.code == 200) {
+                            if (response.data != null) {
+                                listEvaluations = response.data.evaluaciones
+                            }
+                        } else if (response.code == 500) {
+                            errorMessage =
+                                "Ocurrio un error al momento de cargar todas las evaluaciones del usuario . Intentelo más tarde :("
                         }
-                    } else if (response.code == 500) {
-                        errorMessage =
-                            "Ocurrio un error al momento de cargar las evaluaciones de la última semana. Intentelo más tarde :("
+                    } else {
+                        errorMessage = "El servidor no se encuentra disponible en estos momentos"
                     }
-                } else {
-                    errorMessage = "El servidor no se encuentra disponible en estos momentos"
+                    isLoading = false;
                 }
-                isLoading = false;
-                println(listEvaluations)
+            }
+
+            if (seleccion == "Últimos 7 días"){
+                isLoading = true;
+                evaluacionImpl.getLastWeekEvaluacionesByUser(settings.getLong("ID", 0)) { response ->
+                    println("response: $response")
+                    if (response != null) {
+                        if (response.code == 200) {
+                            if (response.data != null) {
+                                listEvaluations = response.data.evaluaciones
+                            }
+                        } else if (response.code == 500) {
+                            errorMessage =
+                                "Ocurrio un error al momento de cargar las evaluaciones de la última semana. Intentelo más tarde :("
+                        }
+                    } else {
+                        errorMessage = "El servidor no se encuentra disponible en estos momentos"
+                    }
+                    isLoading = false;
+                    println(listEvaluations)
+                }
+            }
+
+            if (seleccion == "Último mes"){
+                isLoading = true;
+                evaluacionImpl.getLastMonthEvaluacionesByUser(settings.getLong("ID", 0)) { response ->
+                    println("response: $response")
+                    if (response != null) {
+                        if (response.code == 200) {
+                            if (response.data != null) {
+                                listEvaluations = response.data.evaluaciones
+                            }
+                        } else if (response.code == 500) {
+                            errorMessage =
+                                "Ocurrio un error al momento de cargar las evaluaciones del último mes. Intentelo más tarde :("
+                        }
+                    } else {
+                        errorMessage = "El servidor no se encuentra disponible en estos momentos"
+                    }
+                    isLoading = false;
+                    println(listEvaluations)
+                }
             }
 
         }
@@ -369,6 +412,19 @@ class MyEvaluationsScreen() : Screen {
                         Modifier.fillMaxWidth().padding(top = 10.dp, start = 60.dp, end = 60.dp)
                     ) {
                         if (listEvaluations.isEmpty()) {
+                            var messageEvaluationEmpty: String = ""
+                            if (seleccion == "Últimos 7 días"){
+                                messageEvaluationEmpty = "Aún no tienes evaluaciones en estos últimos 7 días."
+                            }
+
+                            if (seleccion == "Último mes"){
+                                messageEvaluationEmpty = "Aún no tienes evaluaciones en este mes."
+                            }
+
+                            if (seleccion == "Todos"){
+                                messageEvaluationEmpty = "Aún no tienes evaluaciones."
+                            }
+
                             item {
                                 Box(
                                     Modifier
@@ -377,7 +433,7 @@ class MyEvaluationsScreen() : Screen {
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        "Aún no tienes evaluaciones.",
+                                        messageEvaluationEmpty,
                                         textAlign = TextAlign.Center,
                                         fontWeight = FontWeight.Light,
                                         fontSize = 15.sp

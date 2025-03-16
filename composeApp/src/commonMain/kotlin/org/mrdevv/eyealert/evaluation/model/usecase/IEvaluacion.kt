@@ -12,6 +12,8 @@ interface IEvaluacion {
     fun getEvaluacionesByUser(idUser: Long, onResponse: (ResponseEvaluacionByUser?) -> Unit)
     fun getLastEvaluacionesByUser(idUser: Long, onResponse: (ResponseEvaluacionByUser?) -> Unit)
     fun getLastWeekEvaluacionesByUser(idUser: Long, onResponse: (ResponseEvaluacionByUser?) -> Unit)
+    fun getLastMonthEvaluacionesByUser(idUser: Long, onResponse: (ResponseEvaluacionByUser?) -> Unit)
+
     fun getDetailEvaluacion(idUser: Long, onResponse: (ResponseDetailEvaluacion?) -> Unit)
 
     fun getNivelRiesgoEvaluacion(respuestasCuestionario: RequestRespuestasCuestionario, onResponse: (ResponseNivelRiesgo?) -> Unit )

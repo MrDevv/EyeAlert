@@ -57,9 +57,11 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabDisposable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import com.russhwolf.settings.Settings
 import eyealert.composeapp.generated.resources.Res
 import eyealert.composeapp.generated.resources.logo
 import org.jetbrains.compose.resources.painterResource
+
 
 class MainScreen : Screen {
 
@@ -281,38 +283,40 @@ class MainScreen : Screen {
                             )
                         )
 
-                        NavigationBarItem(
-                            selected = tabNavigator.current.key == StatsTab.key,
-                            label = { Text(StatsTab.options.title, fontSize = 8.sp) },
-                            icon = {
-                                Icon(
-                                    painter = StatsTab.options.icon!!,
-                                    contentDescription = null
-                                )
-                            },
-                            onClick = { tabNavigator.current = StatsTab },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = Color.White,
-                                unselectedIconColor = Color(0xFF1976DF),
-                                selectedTextColor = Color.White,
-                                unselectedTextColor = Color(0xFF1976DF),
-                                indicatorColor = Color.Transparent
-                            ),
-                            modifier = Modifier.clip(
-                                RoundedCornerShape(
-                                    topStart = 10.dp,
-                                    topEnd = 10.dp
-                                )
-                            )
-                                .background(
-                                    brush = Brush.verticalGradient(
-                                        colors = if (tabNavigator.current.key == StatsTab.key) listOf(
-                                            Color(0xFF1976DF),
-                                            Color(0xFF0C4D96)
-                                        ) else listOf(Color.Transparent, Color.Transparent)
+                        if (settings.getLong("ID", 0).toInt() == 1){
+                            NavigationBarItem(
+                                selected = tabNavigator.current.key == StatsTab.key,
+                                label = { Text(StatsTab.options.title, fontSize = 8.sp) },
+                                icon = {
+                                    Icon(
+                                        painter = StatsTab.options.icon!!,
+                                        contentDescription = null
+                                    )
+                                },
+                                onClick = { tabNavigator.current = StatsTab },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = Color.White,
+                                    unselectedIconColor = Color(0xFF1976DF),
+                                    selectedTextColor = Color.White,
+                                    unselectedTextColor = Color(0xFF1976DF),
+                                    indicatorColor = Color.Transparent
+                                ),
+                                modifier = Modifier.clip(
+                                    RoundedCornerShape(
+                                        topStart = 10.dp,
+                                        topEnd = 10.dp
                                     )
                                 )
-                        )
+                                    .background(
+                                        brush = Brush.verticalGradient(
+                                            colors = if (tabNavigator.current.key == StatsTab.key) listOf(
+                                                Color(0xFF1976DF),
+                                                Color(0xFF0C4D96)
+                                            ) else listOf(Color.Transparent, Color.Transparent)
+                                        )
+                                    )
+                            )
+                        }
                     }
                 },
             ) { innerPadding ->

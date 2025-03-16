@@ -26,7 +26,7 @@ class EvaluacionImpl : IEvaluacion {
         idUser: Long,
         onResponse: (ResponseEvaluacionByUser?) -> Unit
     ) {
-        val url = "http://192.168.1.4:8080/api/v1/evaluaciones/$idUser"
+        val url = "http://192.168.1.4:8080/api/v1/usuarios/$idUser/evaluaciones"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -46,7 +46,7 @@ class EvaluacionImpl : IEvaluacion {
         idUser: Long,
         onResponse: (ResponseEvaluacionByUser?) -> Unit
     ) {
-        val url = "http://192.168.1.4:8080/api/v1/evaluaciones/$idUser/last"
+        val url = "http://192.168.1.4:8080/api/v1/usuarios/$idUser/evaluaciones/latest"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -66,7 +66,27 @@ class EvaluacionImpl : IEvaluacion {
         idUser: Long,
         onResponse: (ResponseEvaluacionByUser?) -> Unit
     ) {
-        val url = "http://192.168.1.4:8080/api/v1/evaluaciones/$idUser/lastWeek"
+        val url = "http://192.168.1.4:8080/api/v1/usuarios/$idUser/evaluaciones/latest-seven-days"
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = HttpClient.httpClient.get(url).body<ResponseEvaluacionByUser>()
+                onResponse(response)
+            } catch (e: Exception) {
+                println("Error en la api: ${e.message}")
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onResponse(null)
+                }
+            }
+        }
+    }
+
+    override fun getLastMonthEvaluacionesByUser(
+        idUser: Long,
+        onResponse: (ResponseEvaluacionByUser?) -> Unit
+    ) {
+        val url = "http://192.168.1.4:8080/api/v1/usuarios/$idUser/evaluaciones/last-month"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

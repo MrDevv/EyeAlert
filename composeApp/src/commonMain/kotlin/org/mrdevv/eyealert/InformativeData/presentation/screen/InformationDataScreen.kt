@@ -203,13 +203,13 @@ class InformationDataScreen() : Screen {
                             item {
                                 Row(
                                     Modifier.fillParentMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceAround
                                 ) {
                                     rowItems.forEach { item ->
 //                                      CARDS DATOS INFORMATIVOS
                                         Card(
                                             modifier = Modifier
-                                                .width(180.dp)
+                                                .width(170.dp)
                                                 .height(110.dp),
                                             colors = CardDefaults.cardColors(
                                                 containerColor = Color(0xFF6DB2FF)

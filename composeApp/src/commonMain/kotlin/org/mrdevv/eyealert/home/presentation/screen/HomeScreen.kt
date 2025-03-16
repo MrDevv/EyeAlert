@@ -60,6 +60,8 @@ import org.mrdevv.eyealert.InformativeData.presentation.component.ButtonVideo
 import org.mrdevv.eyealert.evaluation.presentation.screen.NewEvaluation
 import org.mrdevv.eyealert.evaluation.data.EvaluacionImpl
 import org.mrdevv.eyealert.evaluation.model.domain.Evaluacion
+import org.mrdevv.eyealert.evaluation.model.dto.ResponseDataEvaluacion
+import org.mrdevv.eyealert.evaluation.presentation.component.FloatingLoader
 import org.mrdevv.eyealert.ui.components.BoxErrorMessage
 import org.mrdevv.eyealert.ui.components.HeaderScreens
 import org.mrdevv.eyealert.ui.components.Loader
@@ -89,6 +91,177 @@ public class HomeScreen : Screen {
 
         var selectedInformativeData by remember { mutableStateOf<DatoInformativo?>(null) }
 
+        var selectedEvaluacion by remember { mutableStateOf<Long?>(null) }
+        var isLoadingDetail by remember { mutableStateOf(false) }
+        var detailEvaluacion by remember { mutableStateOf<ResponseDataEvaluacion?>(null) }
+
+        LaunchedEffect(selectedEvaluacion) {
+            if (selectedEvaluacion != null) {
+                isLoadingDetail = true
+//                delay(4000)
+                evaluacionImpl.getDetailEvaluacion(selectedEvaluacion!!) { response ->
+                    println("response de la api: $response")
+                    if (response != null) {
+                        if (response.code == 200) {
+                            if (response.data != null) {
+                                detailEvaluacion = response.data
+                                selectedEvaluacion = null
+                            }
+                        }
+                    } else {
+                        errorMessage = "El servidor no se encuentra disponible en estos momentos"
+                    }
+                    isLoadingDetail = false;
+                }
+            }
+
+        }
+
+        if (isLoadingDetail) {
+            FloatingLoader()
+        }
+
+        detailEvaluacion?.let { data ->
+
+            val textResult: String
+            val colorResult: Int
+            val fecha: String = data.fecha.split(" ")[0]
+            val hora: String = data.fecha.split(" ")[1]
+
+            if (data.resultado == "alto") {
+                colorResult = 0xFFCC3724.toInt()
+                textResult = "RIESGO ALTO"
+            } else {
+                colorResult = 0xFF0C6D40.toInt()
+                textResult = "RIESGO BAJO"
+            }
+
+            ModalBottomSheet(
+                onDismissRequest = { detailEvaluacion = null },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+                contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
+                dragHandle = {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(30.dp)
+                            .background(Color(0xFF002249)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Spacer(
+                            Modifier
+                                .width(50.dp)
+                                .height(8.dp)
+                                .clip(
+                                    RoundedCornerShape(4.dp)
+                                )
+                                .background(Color.White)
+                        )
+                    }
+                }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF002249))
+                        .padding(bottom = 10.dp, start = 15.dp)
+                ) {
+                    Text(
+                        "DETALLE DE LA EVALUACIÓN",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                Box(
+                    Modifier.fillMaxWidth().background(Color.White)
+                ) {
+                    Column(
+                        Modifier.padding(20.dp)
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(fecha, fontWeight = FontWeight.Bold)
+                            Box(
+                                Modifier.clip(RoundedCornerShape(5.dp))
+                                    .background(Color(colorResult))
+                            ) {
+                                Text(
+                                    text = textResult,
+                                    modifier = Modifier.padding(5.dp),
+                                    color = Color.White
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(5.dp))
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(hora, fontWeight = FontWeight.Bold)
+                        }
+
+                        Spacer(Modifier.height(10.dp))
+
+                        LazyColumn(Modifier.fillMaxWidth()) {
+                            items(data.listaPreguntasRespuestas){ resp ->
+                                if (resp.pregunta == "Ingresa tu edad"){
+                                    Row {
+                                        Text("Edad:")
+                                        Spacer(Modifier.width(5.dp))
+                                        Text(resp.respuesta, fontWeight = FontWeight.Bold)
+                                    }
+                                    Spacer(Modifier.height(10.dp))
+                                }else if(resp.pregunta == "Selecciona tu genero"){
+                                    Row {
+                                        Text("Genero:")
+                                        Spacer(Modifier.width(5.dp))
+                                        Text(resp.respuesta, fontWeight = FontWeight.Bold)
+                                    }
+                                    Spacer(Modifier.height(10.dp))
+                                }else{
+                                    Column(Modifier.fillMaxWidth()) {
+                                        Text(resp.pregunta)
+                                        Spacer(Modifier.height(5.dp))
+                                        Text(modifier = Modifier.fillMaxWidth(), text =  resp.respuesta,textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+                                    }
+                                    Spacer(Modifier.height(10.dp))
+                                }
+
+
+
+
+                            }
+                        }
+
+                        Spacer(Modifier.height(30.dp))
+                        Button(
+                            modifier = Modifier.wrapContentHeight().fillMaxWidth().padding(horizontal = 40.dp),
+                            shape = RoundedCornerShape(5.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF224164),
+                                contentColor = Color.White
+                            ),
+                            onClick = {
+                                detailEvaluacion = null
+                            }
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Cerrar")
+                            }
+                        }
+                        Spacer(Modifier.height(20.dp))
+                    }
+                }
+
+            }
+        }
 
 
         LaunchedEffect(Unit) {
@@ -263,50 +436,57 @@ public class HomeScreen : Screen {
                                         iconBox = Icons.Filled.SentimentDissatisfied
                                     }
 
-                                    Row(
-                                        Modifier.clip(RoundedCornerShape(6.dp)).fillMaxWidth()
-                                            .background(Color(colorBox)).padding(5.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                            Icon(
-                                                iconBox,
-                                                contentDescription = "icon evaluation",
-                                                tint = Color.White,
-                                                modifier = Modifier.size(50.dp)
-                                            )
-                                            Text(
-                                                text = textBox,
-                                                color = Color.White,
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 14.sp
-                                            )
+                                    Card(
+                                        onClick = {
+                                            selectedEvaluacion = evaluacion.id
                                         }
-                                        Column(horizontalAlignment = Alignment.End) {
-                                            Text(fechaFormat, color = Color.White)
-                                            Spacer(Modifier.height(4.dp))
-                                            Row {
-                                                Text(
-                                                    "Tiempo:",
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.Bold
+                                    ) {
+                                        Row(
+                                            Modifier.clip(RoundedCornerShape(6.dp)).fillMaxWidth()
+                                                .background(Color(colorBox)).padding(5.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                                Icon(
+                                                    iconBox,
+                                                    contentDescription = "icon evaluation",
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(50.dp)
                                                 )
-                                                Spacer(Modifier.width(5.dp))
                                                 Text(
-                                                    "${evaluacion.tiempoPredicion} ms",
-                                                    fontSize = 12.sp,
-                                                    color = Color.White
+                                                    text = textBox,
+                                                    color = Color.White,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 14.sp
                                                 )
                                             }
-                                            Spacer(Modifier.height(4.dp))
-                                            Icon(
-                                                Icons.Filled.PostAdd,
-                                                contentDescription = null,
-                                                tint = Color.White
-                                            )
+                                            Column(horizontalAlignment = Alignment.End) {
+                                                Text(fechaFormat, color = Color.White)
+                                                Spacer(Modifier.height(4.dp))
+                                                Row {
+                                                    Text(
+                                                        "Tiempo:",
+                                                        fontSize = 12.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                    Spacer(Modifier.width(5.dp))
+                                                    Text(
+                                                        "${evaluacion.tiempoPredicion} ms",
+                                                        fontSize = 12.sp,
+                                                        color = Color.White
+                                                    )
+                                                }
+                                                Spacer(Modifier.height(4.dp))
+                                                Icon(
+                                                    Icons.Filled.PostAdd,
+                                                    contentDescription = null,
+                                                    tint = Color.White
+                                                )
+                                            }
                                         }
                                     }
+
 
                                     Spacer(Modifier.height(5.dp))
 
