@@ -300,8 +300,8 @@ public class NewEvaluation : Screen {
                         ),
                         enabled = isEnableButton,
                         onClick = {
-                            isLoadingEvaluation = true
                             coroutineScope.launch {
+                                isLoadingEvaluation = true
                                 val edad: Int = respuestasUsuario[1]!!.toInt()
                                 val sexo = if(respuestasUsuario[2]!! == "Masculino"){
                                     1
@@ -419,8 +419,9 @@ public class NewEvaluation : Screen {
                                     }else{
                                         errorMessageModelAPI = "El servidor para realizar la evaluación no se encuentra disponible. Intentelo más tarde :("
                                     }
+                                    isLoadingEvaluation = false
                                 }
-                                isLoadingEvaluation = false
+
                             }
                         }
                     ) {

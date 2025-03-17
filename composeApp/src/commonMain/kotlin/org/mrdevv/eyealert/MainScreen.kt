@@ -283,7 +283,7 @@ class MainScreen : Screen {
                             )
                         )
 
-                        if (settings.getLong("ID", 0).toInt() == 1){
+                        if (settings.getString("ROL", "") == "administrador"){
                             NavigationBarItem(
                                 selected = tabNavigator.current.key == StatsTab.key,
                                 label = { Text(StatsTab.options.title, fontSize = 8.sp) },

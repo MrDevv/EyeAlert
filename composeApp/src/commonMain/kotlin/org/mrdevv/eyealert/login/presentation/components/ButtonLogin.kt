@@ -76,6 +76,7 @@ fun ButtonLogin(navigator: Navigator, email: String, password: String, authProvi
                         if (userResponse?.code == 200 && userResponse.userData != null){
                             settings.putString("NAME", userResponse.userData.nombres)
                             settings.putLong("ID", userResponse.userData.id)
+                            settings.putString("ROL", userResponse.userData.rol)
                             navigator.replaceAll(MainScreen())
                         }else if (userResponse?.code == 200 && userResponse.userData == null){
                             coroutineScope.launch {
