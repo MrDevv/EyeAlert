@@ -3,6 +3,7 @@ package org.mrdevv.eyealert.register.presentation.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ButtonDefaults
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ButtonGoToLogin(onShowContentLoginChange: (Boolean) -> Unit) {
     OutlinedButton(modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(5.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = Color(0xFF1976DF)
