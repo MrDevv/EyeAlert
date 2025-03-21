@@ -14,6 +14,7 @@ import org.mrdevv.eyealert.login.domain.dto.UserRequest
 import org.mrdevv.eyealert.login.domain.dto.UserResponse
 import org.mrdevv.eyealert.login.domain.usecase.AuthProvider
 import org.mrdevv.eyealert.network.HttpClient
+import org.mrdevv.eyealert.register.domain.dto.CreateUsuario
 
 class AuthProviderImpl : AuthProvider{
     override fun signIn(email: String, password: String, onResponse: (UserResponse?) -> Unit) {
@@ -25,27 +26,36 @@ class AuthProviderImpl : AuthProvider{
                     contentType(ContentType.Application.Json)
                     setBody(UserRequest(email, password))
                 }.body<UserResponse>()
-//                println("respuesta API: $response")
-
-//                val userData = response.userData
-
 
                 onResponse(response)
             } catch (e: Exception) {
                 print("Error en la api: ${e.message}")
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    onResponse(null) // Devolver null en caso de error
+                    onResponse(null)
                 }
             }
         }
     }
 
-    override fun signOut() {
-        TODO("Not yet implemented")
-    }
+    override fun register(usuario: CreateUsuario, onResponse: (UserResponse?) -> Unit) {
+        val url = "http://192.168.1.4:8080/api/v1/usuarios"
 
-    override fun getCurrentUser() {
-        TODO("Not yet implemented")
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = HttpClient.httpClient.post(url) {
+                    contentType(ContentType.Application.Json)
+                    setBody(usuario)
+                }.body<UserResponse>()
+
+                onResponse(response)
+            } catch (e: Exception) {
+                print("Error en la api: ${e.message}")
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onResponse(null)
+                }
+            }
+        }
     }
 }

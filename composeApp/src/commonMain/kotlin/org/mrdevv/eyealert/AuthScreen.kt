@@ -97,7 +97,7 @@ class AuthScreen:Screen{
                 if (showContentLogin) {
                     FormLogin(navigator) { showContentLogin = it }
                 } else {
-                    FormRegister() { showContentLogin = it }
+                    FormRegister(navigator) { showContentLogin = it }
                 }
             }
         }
