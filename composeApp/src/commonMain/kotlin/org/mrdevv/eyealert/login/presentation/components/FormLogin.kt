@@ -24,19 +24,32 @@ fun FormLogin(navigator: Navigator, onShowContentLoginChange: (Boolean) -> Unit)
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    var isValidEmail by remember { mutableStateOf(true) }
+
     val authProvider = AuthProviderImpl()
 
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    var isEnableButton by remember { mutableStateOf(false) }
+
+    if (email.isNotEmpty()
+        && isValidEmail
+        && password.isNotEmpty()){
+        isEnableButton = true
+    }else{
+        isEnableButton = false
+    }
+
 
     Text("INICIAR SESIÓN", fontSize = 20.sp, fontWeight = FontWeight.Bold)
     Spacer(Modifier.height(5.dp))
     Text("Por favor inicia sesión para continuar.")
     Spacer(Modifier.height(15.dp))
-    Email(email) { email = it }
+    Email(email, isValidEmail, onValidEmailChange = { isValidEmail = it }) { email = it }
     Spacer(Modifier.height(5.dp))
     Password(password) { password = it }
     Spacer(Modifier.height(10.dp))
-    ButtonLogin(navigator, email, password, authProvider){
+    ButtonLogin(navigator, isEnableButton, email, password, authProvider){
         keyboardController?.hide()
     }
     DividerFormsAuth()

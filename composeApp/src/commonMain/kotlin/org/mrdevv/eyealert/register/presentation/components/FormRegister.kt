@@ -28,6 +28,8 @@ fun FormRegister(navigator: Navigator, onShowContentLoginChange: (Boolean) -> Un
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    var isValidEmail by remember { mutableStateOf(true) }
+
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val authProvider = AuthProviderImpl()
@@ -47,7 +49,7 @@ fun FormRegister(navigator: Navigator, onShowContentLoginChange: (Boolean) -> Un
     Spacer(Modifier.height(5.dp))
     LastName(lastName) { lastName = it }
     Spacer(Modifier.height(5.dp))
-    Email(email) { email = it }
+    Email(email, isValidEmail, onValidEmailChange = { isValidEmail = it }) { email = it }
     Spacer(Modifier.height(5.dp))
     Password(password) { password = it }
     Spacer(Modifier.height(10.dp))

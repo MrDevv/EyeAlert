@@ -30,20 +30,11 @@ import org.mrdevv.eyealert.ui.components.Loader
 private val settings: Settings = Settings()
 
 @Composable
-fun ButtonLogin(navigator: Navigator, email: String, password: String, authProvider: AuthProvider, hideKeyBoard: () -> Unit) {
+fun ButtonLogin(navigator: Navigator, isEnableButton: Boolean, email: String, password: String, authProvider: AuthProvider, hideKeyBoard: () -> Unit) {
 
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var isLoading by remember { mutableStateOf(false) }
-
-
-    var isEnableButton by remember { mutableStateOf(false) }
-
-    if (email.isNotEmpty() && password.isNotEmpty()){
-        isEnableButton = true
-    }else{
-        isEnableButton = false
-    }
 
     if (isLoading){
         Loader(50)
@@ -53,7 +44,7 @@ fun ButtonLogin(navigator: Navigator, email: String, password: String, authProvi
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF1976DF),
                 contentColor = Color.White,
-                disabledContainerColor = Color(0xFF969fe1)
+                disabledContainerColor = Color(0xFF76B6FF)
             ),
 //            enabled = isEnableButtonValue,
             enabled = isEnableButton,

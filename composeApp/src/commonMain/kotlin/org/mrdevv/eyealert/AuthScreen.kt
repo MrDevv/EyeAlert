@@ -92,7 +92,7 @@ class AuthScreen:Screen{
                     )
                     .background(Color.White)
                     .padding(horizontal = 30.dp, vertical = 40.dp)
-                    .weight(2f)
+                    .weight(2.3f)
             ) {
                 if (showContentLogin) {
                     FormLogin(navigator) { showContentLogin = it }
