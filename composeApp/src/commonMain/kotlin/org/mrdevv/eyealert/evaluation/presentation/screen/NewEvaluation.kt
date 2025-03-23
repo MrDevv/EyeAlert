@@ -33,6 +33,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -240,6 +241,13 @@ public class NewEvaluation : Screen {
                                             }
                                         },
                                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                        colors = TextFieldDefaults.colors(
+                                            focusedTextColor = Color(0xFF464646),
+                                            focusedContainerColor = Color(0xFFE3E3E3),
+                                            unfocusedContainerColor = Color(0xFFE3E3E3),
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent
+                                        ),
                                         keyboardOptions = KeyboardOptions.Default.copy(
                                             keyboardType = KeyboardType.Number
                                         )
