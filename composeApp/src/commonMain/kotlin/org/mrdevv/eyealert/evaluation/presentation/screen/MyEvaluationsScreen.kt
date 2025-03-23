@@ -272,6 +272,8 @@ class MyEvaluationsScreen() : Screen {
                         if (response.code == 200) {
                             if (response.data != null) {
                                 listEvaluations = response.data.evaluaciones
+                            } else{
+                                listEvaluations = emptyList()
                             }
                         } else if (response.code == 500) {
                             errorMessage =
@@ -292,6 +294,8 @@ class MyEvaluationsScreen() : Screen {
                         if (response.code == 200) {
                             if (response.data != null) {
                                 listEvaluations = response.data.evaluaciones
+                            }else{
+                                listEvaluations = emptyList()
                             }
                         } else if (response.code == 500) {
                             errorMessage =
@@ -313,6 +317,8 @@ class MyEvaluationsScreen() : Screen {
                         if (response.code == 200) {
                             if (response.data != null) {
                                 listEvaluations = response.data.evaluaciones
+                            }else{
+                                listEvaluations = emptyList()
                             }
                         } else if (response.code == 500) {
                             errorMessage =

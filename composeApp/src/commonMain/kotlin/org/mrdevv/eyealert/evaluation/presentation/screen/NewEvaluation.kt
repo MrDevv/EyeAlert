@@ -30,6 +30,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -80,6 +82,7 @@ public class NewEvaluation : Screen {
     @Composable
     override fun Content() {
         val keyboardController = LocalSoftwareKeyboardController.current
+        val snackbarHostState = remember { SnackbarHostState() }
 
         val preguntasImpl = PreguntasImpl();
         val evaluacionImpl = EvaluacionImpl()
@@ -115,7 +118,7 @@ public class NewEvaluation : Screen {
         var isBottomSheetVisible by remember { mutableStateOf(false) } // Estado del BottomSheet
 
         LaunchedEffect(isBottomSheetVisible) {
-            if (modalHasVisible && !isBottomSheetVisible){
+            if (modalHasVisible && !isBottomSheetVisible) {
                 navigator.pop()
             }
         }
@@ -147,9 +150,9 @@ public class NewEvaluation : Screen {
         if (isBottomSheetVisible) {
             modalHasVisible = true
 //            val randomNumber = Random.nextInt(0, 2)
-            if (textResultEvaluacion?.contains("bajo") == true){
+            if (textResultEvaluacion?.contains("bajo") == true) {
                 LowRisk(navigator) { isBottomSheetVisible = it }
-            }else{
+            } else {
                 HighRisk(navigator) { isBottomSheetVisible = it }
             }
         }
@@ -180,10 +183,13 @@ public class NewEvaluation : Screen {
                             .padding(vertical = 8.dp, horizontal = 12.dp)
                     ) {
                         Row(Modifier.fillMaxWidth()) {
-                            Text(text = "${index + 1}. ${pregunta.descripcion}", color = Color.Black)
-                            if (pregunta.descripcion.contains("edad")){
+                            Text(
+                                text = "${index + 1}. ${pregunta.descripcion}",
+                                color = Color.Black
+                            )
+                            if (pregunta.descripcion.contains("edad")) {
                                 Spacer(Modifier.width(5.dp))
-                                Text("(mayor o igual de 40 años)", fontWeight =  FontWeight.Bold)
+                                Text("(mayor o igual de 40 años)", fontWeight = FontWeight.Bold)
                             }
                         }
                         Row(
@@ -200,22 +206,24 @@ public class NewEvaluation : Screen {
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         val respClean = respuesta.respuesta.trim()
-                                        if (respClean != "Masculino" && respClean != "Femenino"){
+                                        if (respClean != "Masculino" && respClean != "Femenino") {
                                             Text(text = respuesta.respuesta)
                                         }
-                                        if (respClean == "Masculino"){
+                                        if (respClean == "Masculino") {
                                             Icon(
                                                 modifier = Modifier.size(40.dp),
-                                                imageVector =  Icons.Default.Man,
+                                                imageVector = Icons.Default.Man,
                                                 tint = Color(0xFF224164),
-                                                contentDescription = "icon man")
+                                                contentDescription = "icon man"
+                                            )
                                         }
-                                        if (respClean == "Femenino"){
+                                        if (respClean == "Femenino") {
                                             Icon(
                                                 modifier = Modifier.size(40.dp),
-                                                imageVector =  Icons.Default.Woman,
+                                                imageVector = Icons.Default.Woman,
                                                 tint = Color(0xFFA11AEA),
-                                                contentDescription = "icon man")
+                                                contentDescription = "icon man"
+                                            )
                                         }
                                         RadioButton(
                                             selected = selectedOption == respuesta.respuesta,
@@ -231,13 +239,10 @@ public class NewEvaluation : Screen {
                             } else {
                                 Column {
                                     TextField(
-//                                        value = valueInput,
                                         value = respuestasUsuario[pregunta.id] ?: "",
                                         onValueChange = { input ->
-                                            if (input.all { char -> char.isDigit() }) { // Filtra solo números
-//                                                valueInput = it
-                                                    respuestasUsuario[pregunta.id] = input
-
+                                            if (input.all { char -> char.isDigit() }) {
+                                                respuestasUsuario[pregunta.id] = input
                                             }
                                         },
                                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -263,7 +268,11 @@ public class NewEvaluation : Screen {
                         modifier = Modifier.fillParentMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(Modifier.fillParentMaxSize(), verticalArrangement =  Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(
+                            Modifier.fillParentMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             BoxErrorMessage(errorMessage, 100)
                             Spacer(Modifier.height(20.dp))
                             TextButton(
@@ -286,9 +295,9 @@ public class NewEvaluation : Screen {
                 }
             }
 
-            if (listPreguntas.size == respuestasUsuario.size && !respuestasUsuario.values.any{ it.isEmpty()} && respuestasUsuario.values.any{ it.toIntOrNull()?: 0 >= 40 } ){
+            if (listPreguntas.size == respuestasUsuario.size && !respuestasUsuario.values.any { it.isEmpty() } && respuestasUsuario.values.any { it.toIntOrNull() ?: 0 >= 40 }) {
                 isEnableButton = true
-            }else{
+            } else {
                 isEnableButton = false
             }
 
@@ -311,121 +320,147 @@ public class NewEvaluation : Screen {
                             coroutineScope.launch {
                                 isLoadingEvaluation = true
                                 val edad: Int = respuestasUsuario[1]!!.toInt()
-                                val sexo = if(respuestasUsuario[2]!! == "Masculino"){
+                                val sexo = if (respuestasUsuario[2]!! == "Masculino") {
                                     1
-                                }else{
+                                } else {
                                     0
                                 }
-                                val PIOEvelada = if(respuestasUsuario[3]!! == "Sí"){
+                                val PIOEvelada = if (respuestasUsuario[3]!! == "Sí") {
                                     1
-                                }else{
+                                } else {
                                     0
                                 }
-                                val historialFamiliar = if(respuestasUsuario[4]!! == "Sí"){
+                                val historialFamiliar = if (respuestasUsuario[4]!! == "Sí") {
                                     1
-                                }else{
+                                } else {
                                     0
                                 }
-                                val diabetes = if(respuestasUsuario[5]!! == "Sí"){
+                                val diabetes = if (respuestasUsuario[5]!! == "Sí") {
                                     1
-                                }else{
+                                } else {
                                     0
                                 }
-                                val hipertension = if(respuestasUsuario[6]!! == "Sí"){
+                                val hipertension = if (respuestasUsuario[6]!! == "Sí") {
                                     1
-                                }else{
+                                } else {
                                     0
                                 }
-                                val catarata = if(respuestasUsuario[7]!! == "Sí"){
+                                val catarata = if (respuestasUsuario[7]!! == "Sí") {
                                     1
-                                }else{
+                                } else {
                                     0
                                 }
 
 
-
-                                 val respuestasCuestionario = RequestRespuestasCuestionario(edad, sexo, PIOEvelada, historialFamiliar, diabetes, hipertension, catarata)
+                                val respuestasCuestionario = RequestRespuestasCuestionario(
+                                    edad,
+                                    sexo,
+                                    PIOEvelada,
+                                    historialFamiliar,
+                                    diabetes,
+                                    hipertension,
+                                    catarata
+                                )
                                 evaluacionImpl.getNivelRiesgoEvaluacion(respuestasCuestionario) { response ->
-                                    if (response != null){
-                                        if (response.status == 200){
+                                    if (response != null) {
+                                        if (response.status == 200) {
                                             val tiempoPrediccion = response.predictionTimeMs
                                             val resultado = response.resultEvaluation.toInt()
                                             val usuarioId = settings.getLong("ID", 0)
 
-                                            var detalleEvaluacion: MutableList<CrearDetalleEvaluacionDTO> = mutableListOf()
+                                            var detalleEvaluacion: MutableList<CrearDetalleEvaluacionDTO> =
+                                                mutableListOf()
 
 
-                                            var idRespuestaSi : Long = 0
-                                            var idRespuestaNo : Long = 0
+                                            var idRespuestaSi: Long = 0
+                                            var idRespuestaNo: Long = 0
                                             var idRespuestaMasculino: Long = 0
                                             var idRespuestaFemenino: Long = 0
 
                                             listPreguntas.forEach { pregunta ->
                                                 pregunta.listRespuestas.forEach { pregunta ->
-                                                    if (pregunta.respuesta == "Sí"){
-                                                        idRespuestaSi =pregunta.id
+                                                    if (pregunta.respuesta == "Sí") {
+                                                        idRespuestaSi = pregunta.id
                                                     }
 
-                                                    if (pregunta.respuesta == "No"){
-                                                        idRespuestaNo =pregunta.id
+                                                    if (pregunta.respuesta == "No") {
+                                                        idRespuestaNo = pregunta.id
                                                     }
 
-                                                    if (pregunta.respuesta == "Masculino"){
-                                                        idRespuestaMasculino =pregunta.id
+                                                    if (pregunta.respuesta == "Masculino") {
+                                                        idRespuestaMasculino = pregunta.id
                                                     }
 
-                                                    if (pregunta.respuesta == "Femenino"){
-                                                        idRespuestaFemenino =pregunta.id
+                                                    if (pregunta.respuesta == "Femenino") {
+                                                        idRespuestaFemenino = pregunta.id
                                                     }
                                                 }
                                             }
 
                                             respuestasUsuario.forEach { respuesta ->
-                                                var respuestaId : Long? = null
+                                                var respuestaId: Long? = null
 
                                                 var respuestaTexto: String = ""
 
-                                                if (respuesta.value == "Sí"){
+                                                if (respuesta.value == "Sí") {
                                                     respuestaId = idRespuestaSi
                                                 }
 
-                                                if (respuesta.value == "No"){
+                                                if (respuesta.value == "No") {
                                                     respuestaId = idRespuestaNo
                                                 }
 
-                                                if (respuesta.value == "Masculino"){
+                                                if (respuesta.value == "Masculino") {
                                                     respuestaId = idRespuestaMasculino
                                                 }
 
-                                                if (respuesta.value == "Femenino"){
+                                                if (respuesta.value == "Femenino") {
                                                     respuestaId = idRespuestaFemenino
                                                 }
 
-                                                if(respuesta.value != "Femenino" && respuesta.value != "Masculino" && respuesta.value != "Sí" && respuesta.value != "No"){
+                                                if (respuesta.value != "Femenino" && respuesta.value != "Masculino" && respuesta.value != "Sí" && respuesta.value != "No") {
                                                     respuestaTexto = respuesta.value
                                                 }
 
-                                                var crearDetalleEvaluacionDTO = CrearDetalleEvaluacionDTO(respuesta.key, respuestaId, respuestaTexto)
+                                                var crearDetalleEvaluacionDTO =
+                                                    CrearDetalleEvaluacionDTO(
+                                                        respuesta.key,
+                                                        respuestaId,
+                                                        respuestaTexto
+                                                    )
                                                 detalleEvaluacion.add(crearDetalleEvaluacionDTO)
                                             }
 
-                                            evaluacionImpl.crearEvaluacion(CrearEvaluacionDTO(tiempoPrediccion, resultado, usuarioId, detalleEvaluacion)){ responseCreateEvaluation ->
+                                            evaluacionImpl.crearEvaluacion(
+                                                CrearEvaluacionDTO(
+                                                    tiempoPrediccion,
+                                                    resultado,
+                                                    usuarioId,
+                                                    detalleEvaluacion
+                                                )
+                                            ) { responseCreateEvaluation ->
                                                 if (responseCreateEvaluation != null) {
-                                                    if (responseCreateEvaluation.code == 201){
+                                                    if (responseCreateEvaluation.code == 201) {
                                                         textResultEvaluacion = response.message
                                                         isBottomSheetVisible = true
-                                                    }else{
-                                                        errorMessageCreateEvaluation = "Ocurrió un error al momento de guardar la evaluación."
+                                                    } else {
+                                                        errorMessageCreateEvaluation =
+                                                            "Ocurrió un error al momento de guardar la evaluación."
                                                     }
-                                                }else{
-                                                    errorMessageCreateEvaluation = "El servidor no se encuentra disponible. Intentelo más tarde :("
+                                                } else {
+                                                    errorMessageCreateEvaluation =
+                                                        "El servidor no se encuentra disponible. Intentelo más tarde :("
                                                 }
                                             }
-                                        }else{
-                                            errorMessageModelAPI = "Ocurrió un error al momento de realizar la evaluación."
+                                        } else {
+                                            errorMessageModelAPI =
+                                                "Ocurrió un error al momento de realizar la evaluación."
                                         }
-                                    }else{
-                                        errorMessageModelAPI = "El servidor para realizar la evaluación no se encuentra disponible. Intentelo más tarde :("
+                                    } else {
+                                        coroutineScope.launch {
+                                            errorMessageModelAPI = "El servidor para realizar la evaluación no se encuentra disponible. Intentelo más tarde :("
+                                            snackbarHostState.showSnackbar(errorMessageModelAPI!!)
+                                        }
                                     }
                                     isLoadingEvaluation = false
                                 }
@@ -443,7 +478,7 @@ public class NewEvaluation : Screen {
         if (showButton && listPreguntas.isNotEmpty()) {
             FloatingButton(listPreguntas, listState, coroutineScope)
         }
-
+        SnackbarHost(hostState = snackbarHostState)
     }
 
 }

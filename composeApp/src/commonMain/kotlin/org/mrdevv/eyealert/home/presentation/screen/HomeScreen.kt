@@ -57,12 +57,15 @@ import org.mrdevv.eyealert.InformativeData.data.DatoInformativoImpl
 import org.mrdevv.eyealert.InformativeData.model.domain.DatoInformativo
 import org.mrdevv.eyealert.InformativeData.presentation.component.ButtonMoreInformation
 import org.mrdevv.eyealert.InformativeData.presentation.component.ButtonVideo
+import org.mrdevv.eyealert.InformativeData.presentation.component.CardInformativeData
+import org.mrdevv.eyealert.InformativeData.presentation.component.ModalInformationData
 import org.mrdevv.eyealert.evaluation.presentation.screen.NewEvaluation
 import org.mrdevv.eyealert.evaluation.data.EvaluacionImpl
 import org.mrdevv.eyealert.evaluation.model.domain.Evaluacion
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseDataEvaluacion
 import org.mrdevv.eyealert.evaluation.presentation.component.CardEvaluation
 import org.mrdevv.eyealert.evaluation.presentation.component.FloatingLoader
+import org.mrdevv.eyealert.evaluation.presentation.component.ModalDetailEvaluation
 import org.mrdevv.eyealert.ui.components.BoxErrorMessage
 import org.mrdevv.eyealert.ui.components.HeaderScreens
 import org.mrdevv.eyealert.ui.components.Loader
@@ -136,136 +139,12 @@ public class HomeScreen : Screen {
                 textResult = "RIESGO BAJO"
             }
 
-            ModalBottomSheet(
-                onDismissRequest = { detailEvaluacion = null },
-                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-                contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
-                dragHandle = {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(30.dp)
-                            .background(Color(0xFF002249)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Spacer(
-                            Modifier
-                                .width(50.dp)
-                                .height(8.dp)
-                                .clip(
-                                    RoundedCornerShape(4.dp)
-                                )
-                                .background(Color.White)
-                        )
-                    }
-                }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFF002249))
-                        .padding(bottom = 10.dp, start = 15.dp)
-                ) {
-                    Text(
-                        "DETALLE DE LA EVALUACIÓN",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-
-                Box(
-                    Modifier.fillMaxWidth().background(Color.White)
-                ) {
-                    Column(
-                        Modifier.padding(20.dp)
-                    ) {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(fecha, fontWeight = FontWeight.Bold)
-                            Box(
-                                Modifier.clip(RoundedCornerShape(5.dp))
-                                    .background(Color(colorResult))
-                            ) {
-                                Text(
-                                    text = textResult,
-                                    modifier = Modifier.padding(5.dp),
-                                    color = Color.White
-                                )
-                            }
-                        }
-                        Spacer(Modifier.height(5.dp))
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(hora, fontWeight = FontWeight.Bold)
-                        }
-
-                        Spacer(Modifier.height(10.dp))
-
-                        LazyColumn(Modifier.fillMaxWidth()) {
-                            items(data.listaPreguntasRespuestas){ resp ->
-                                if (resp.pregunta == "Ingresa tu edad"){
-                                    Row {
-                                        Text("Edad:")
-                                        Spacer(Modifier.width(5.dp))
-                                        Text(resp.respuesta, fontWeight = FontWeight.Bold)
-                                    }
-                                    Spacer(Modifier.height(10.dp))
-                                }else if(resp.pregunta == "Selecciona tu genero"){
-                                    Row {
-                                        Text("Genero:")
-                                        Spacer(Modifier.width(5.dp))
-                                        Text(resp.respuesta, fontWeight = FontWeight.Bold)
-                                    }
-                                    Spacer(Modifier.height(10.dp))
-                                }else{
-                                    Column(Modifier.fillMaxWidth()) {
-                                        Text(resp.pregunta)
-                                        Spacer(Modifier.height(5.dp))
-                                        Text(modifier = Modifier.fillMaxWidth(), text =  resp.respuesta,textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
-                                    }
-                                    Spacer(Modifier.height(10.dp))
-                                }
-
-
-
-
-                            }
-                        }
-
-                        Spacer(Modifier.height(30.dp))
-                        Button(
-                            modifier = Modifier.wrapContentHeight().fillMaxWidth().padding(horizontal = 40.dp),
-                            shape = RoundedCornerShape(5.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF224164),
-                                contentColor = Color.White
-                            ),
-                            onClick = {
-                                detailEvaluacion = null
-                            }
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text("Cerrar")
-                            }
-                        }
-                        Spacer(Modifier.height(20.dp))
-                    }
-                }
-
+            ModalDetailEvaluation(fecha, textResult, colorResult, hora, data) {
+                detailEvaluacion = it
             }
         }
 
-
         LaunchedEffect(Unit) {
-//                delay(4000)
             evaluacionImpl.getLastEvaluacionesByUser(settings.getLong("ID", 0)) { response ->
                 if (response != null) {
                     if (response.code == 200) {
@@ -284,95 +163,26 @@ public class HomeScreen : Screen {
 
             datoInformativoImpl.getTresDatosInformativosAleatorios { response ->
                 println(response)
-                if (response != null){
+                if (response != null) {
                     if (response.code == 200) {
                         if (response.data != null) {
                             listThreeInformativeData = response.data
                         }
                     } else if (response.code == 500) {
-                        errorMessageInformativeData = "Ocurrio un error al momento de cargar los datos informativos. Intentelo más tarde :("
+                        errorMessageInformativeData =
+                            "Ocurrio un error al momento de cargar los datos informativos. Intentelo más tarde :("
                     }
-                }else {
-                    errorMessageInformativeData = "El servidor no se encuentra disponible en estos momentos"
+                } else {
+                    errorMessageInformativeData =
+                        "El servidor no se encuentra disponible en estos momentos"
                 }
                 isLoadingInformativeData = false;
             }
         }
 
-
-
         selectedInformativeData?.let { data ->
-            ModalBottomSheet(
-                onDismissRequest = { selectedInformativeData = null },
-                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-                contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
-                dragHandle = {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(30.dp)
-                            .background(Color(0xFF6DB2FF)),
-                        contentAlignment = Alignment.Center
-                    ){
-                        Spacer(
-                            Modifier
-                                .width(50.dp)
-                                .height(8.dp)
-                                .clip(
-                                    RoundedCornerShape(4.dp)
-                                )
-                                .background(Color.White)
-                        )
-                    }
-                }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFF6DB2FF))
-                        .padding(bottom = 10.dp, start = 15.dp)
-                ){
-                    Text(
-                        "¿Sabías qué...?",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                ) {
-                    Column(
-                        Modifier.padding(20.dp)
-                    ) {
-                        Text(text = data.descripcion)
-
-                        Spacer(modifier = Modifier.height(50.dp))
-
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            Icon(
-                                modifier =  Modifier.size(120.dp),
-                                imageVector =  Icons.Default.Lightbulb,
-                                contentDescription = "icon led informative data",
-                                tint = Color(0xFFC1CA3D))
-                        }
-
-                        Spacer(modifier = Modifier.height(30.dp))
-
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Column {
-                                if (data.fuenteMultimedia.isNotEmpty()){
-                                    ButtonVideo(data.fuenteMultimedia)
-                                }
-                            }
-                            ButtonMoreInformation(data.fuente)
-                        }
-
-                        Spacer(modifier = Modifier.height(50.dp))
-                    }
-                }
+            ModalInformationData(data){
+                selectedInformativeData = it
             }
         }
 
@@ -406,24 +216,21 @@ public class HomeScreen : Screen {
                             Loader(60)
                         }
 
-    //                CARD EVALUACION
+                        //                CARD EVALUACION
                         if (errorMessage.isNullOrEmpty() && !isLoading) {
                             Column {
                                 if (listLastEvaluations.isEmpty()) {
-//                                    item {
-                                        Box(
-                                            Modifier.fillMaxWidth().padding(top = 5.dp, bottom = 10.dp)
-                                        ) {
-                                            Text(
-                                                "Aún no tienes evaluaciones, realiza una presionando en el botón de abajo.",
-                                                textAlign = TextAlign.Center,
-                                                fontWeight = FontWeight.Light,
-                                                fontSize = 15.sp
-                                            )
-                                        }
-//                                    }
+                                    Box(
+                                        Modifier.fillMaxWidth().padding(top = 5.dp, bottom = 10.dp)
+                                    ) {
+                                        Text(
+                                            "Aún no tienes evaluaciones, realiza una presionando en el botón de abajo.",
+                                            textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.Light,
+                                            fontSize = 15.sp
+                                        )
+                                    }
                                 } else {
-//                                    items(listLastEvaluations) { evaluacion ->
                                     listLastEvaluations.forEach { evaluacion ->
                                         var colorBox: Int
                                         var textBox: String
@@ -441,7 +248,13 @@ public class HomeScreen : Screen {
                                             iconBox = Icons.Filled.SentimentDissatisfied
                                         }
 
-                                        CardEvaluation(evaluacion, colorBox, iconBox, textBox, fechaFormat){
+                                        CardEvaluation(
+                                            evaluacion,
+                                            colorBox,
+                                            iconBox,
+                                            textBox,
+                                            fechaFormat
+                                        ) {
                                             selectedEvaluacion = it
                                         }
 
@@ -487,90 +300,39 @@ public class HomeScreen : Screen {
                 Column(
                     Modifier.clip(RoundedCornerShape(6.dp)).fillMaxWidth().background(Color.White)
                 ) {
-//                    item {
-                        Row(
-                            Modifier.fillMaxWidth().background(Color(0xFF002249)),
-                            horizontalArrangement = Arrangement.Center
+                    Row(
+                        Modifier.fillMaxWidth().background(Color(0xFF002249)),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text("SABIAS QUE...", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+
+                    if (isLoadingInformativeData) {
+                        Loader(60)
+                    }
+
+                    if (errorMessageInformativeData.isNullOrEmpty() && !isLoadingInformativeData) {
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Text("SABIAS QUE...", color = Color.White, fontWeight = FontWeight.Bold)
-                        }
-//                    }
-
-//                    item {
-                        if (isLoadingInformativeData) {
-                            Loader(60)
-                        }
-//                    }
-
-//                    item {
-                        if (errorMessageInformativeData.isNullOrEmpty() && !isLoadingInformativeData) {
-                            LazyRow(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                items(listThreeInformativeData) { infomativeData ->
-                                    Card(
-                                        modifier = Modifier
-                                            .width(250.dp)
-                                            .height(110.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = Color(0xFF6DB2FF)
-                                        ),
-                                        shape = RoundedCornerShape(8.dp),
-                                        onClick = {
-                                            selectedInformativeData = infomativeData
-                                        }
-                                    ) {
-                                        Box(
-                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Column(horizontalAlignment = Alignment.Start) {
-                                                Row(
-                                                    modifier = Modifier.fillMaxWidth().weight(2.6f),
-                                                    verticalAlignment = Alignment.CenterVertically
-                                                ) {
-                                                    Text(
-                                                        text = limitText(infomativeData.descripcion, 12),
-                                                        fontSize = 14.sp,
-                                                        textAlign = TextAlign.Center
-                                                    )
-                                                }
-                                                Icon(
-                                                    imageVector = Icons.Default.Lightbulb,
-                                                    contentDescription = null,
-                                                    tint = Color(0xFFB2FF59),
-                                                    modifier = Modifier.size(32.dp).weight(1f)
-                                                )
-                                            }
-                                        }
-                                    }
-                        }
+                            items(listThreeInformativeData) { infomativeData ->
+                                CardInformativeData(infomativeData){
+                                    selectedInformativeData = it
                                 }
                             }
-//                    }
-
-//                    item {
-                        if (errorMessageInformativeData != null && !isLoadingInformativeData) {
-                            BoxErrorMessage(errorMessageInformativeData, 50)
                         }
-//                    }
+                    }
+
+                    if (errorMessageInformativeData != null && !isLoadingInformativeData) {
+                        BoxErrorMessage(errorMessageInformativeData, 50)
+                    }
                 }
                 Spacer(Modifier.height(10.dp))
             }
 
         }
     }
-
-    fun limitText(text: String, limit: Int): String {
-        val words = text.split(" ")
-        return if (words.size > limit) {
-            words.take(limit).joinToString(" ") + "..."
-        } else {
-            text
-        }
-    }
 }
-

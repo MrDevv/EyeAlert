@@ -2,12 +2,11 @@ package org.mrdevv.eyealert
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.russhwolf.settings.Settings
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.mrdevv.eyealert.home.presentation.screen.HomeScreen
+import org.mrdevv.eyealert.ui.screen.AuthScreen
+import org.mrdevv.eyealert.ui.screen.MainScreen
 
 val settings : Settings = Settings()
 

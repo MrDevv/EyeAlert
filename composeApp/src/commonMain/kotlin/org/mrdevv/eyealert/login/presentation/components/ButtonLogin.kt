@@ -19,11 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.stack.popUntil
 import cafe.adriel.voyager.navigator.Navigator
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.launch
-import org.mrdevv.eyealert.MainScreen
+import org.mrdevv.eyealert.ui.screen.MainScreen
 import org.mrdevv.eyealert.login.domain.usecase.AuthProvider
 import org.mrdevv.eyealert.ui.components.Loader
 
