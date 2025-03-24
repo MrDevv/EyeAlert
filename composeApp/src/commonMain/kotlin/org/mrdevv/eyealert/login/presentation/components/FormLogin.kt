@@ -1,6 +1,7 @@
 package org.mrdevv.eyealert.login.presentation.components
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
@@ -48,6 +50,8 @@ fun FormLogin(navigator: Navigator, onShowContentLoginChange: (Boolean) -> Unit)
     Email(email, isValidEmail, onValidEmailChange = { isValidEmail = it }) { email = it }
     Spacer(Modifier.height(5.dp))
     Password(password) { password = it }
+    Spacer(Modifier.height(5.dp))
+    Text(modifier = Modifier.fillMaxWidth(), text = "¿Has olvidado tu contraseña?", textAlign = TextAlign.Right)
     Spacer(Modifier.height(10.dp))
     ButtonLogin(navigator, isEnableButton, email, password, authProvider){
         keyboardController?.hide()
