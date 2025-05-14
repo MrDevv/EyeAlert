@@ -152,7 +152,7 @@ class InformationDataScreen() : Screen {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                if (data.fuenteMultimedia.isNotEmpty()) {
+                                if (data.fuenteMultimedia?.isNotEmpty() == true) {
                                     ButtonVideo(data.fuenteMultimedia)
                                 }
                             }

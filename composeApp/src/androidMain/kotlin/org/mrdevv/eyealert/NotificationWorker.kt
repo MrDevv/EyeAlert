@@ -70,8 +70,8 @@ class NotificationWorker (
             ).apply {
                 description = "Canal para notificaciones flotantes"
                 enableLights(true)
-                lightColor = android.graphics.Color.RED // 🔥 Habilita luces
-                enableVibration(true) // 🔥 Asegura que haya vibración
+                lightColor = android.graphics.Color.RED
+                enableVibration(true)
                 setSound(null, null)
             }
 

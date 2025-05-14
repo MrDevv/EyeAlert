@@ -98,7 +98,7 @@ fun ModalInformationData(informativeData: DatoInformativo, selectedInformativeDa
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        if (informativeData.fuenteMultimedia.isNotEmpty()) {
+                        if (informativeData.fuenteMultimedia?.isNotEmpty() == true) {
                             ButtonVideo(informativeData.fuenteMultimedia)
                         }
                     }

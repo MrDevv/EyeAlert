@@ -29,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,21 +50,105 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabDisposable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import com.russhwolf.settings.Settings
 import eyealert.composeapp.generated.resources.Res
 import eyealert.composeapp.generated.resources.logo
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDate
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
+import org.mrdevv.eyealert.configCuestionario.data.ConfigCuestionarioImpl
+import org.mrdevv.eyealert.evaluation.presentation.component.FloatingLoader
+import org.mrdevv.eyealert.questionnaire.presentation.screen.QuestionnaireScreen
 import org.mrdevv.eyealert.settings
 import org.mrdevv.eyealert.ui.navigatorBarTabs.HomeTab
 import org.mrdevv.eyealert.ui.navigatorBarTabs.InformationDataTab
 import org.mrdevv.eyealert.ui.navigatorBarTabs.MyEvaluationsTab
 import org.mrdevv.eyealert.ui.navigatorBarTabs.StatsTab
 
+private val settings: Settings = Settings()
 
 class MainScreen : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val configCuestionarioImpl = ConfigCuestionarioImpl();
+        var diasEspera by remember { mutableStateOf<Int?>(null) }
+        var errorMessage by remember { mutableStateOf<String?>(null) }
+        var isLoadingDiasEspera by remember { mutableStateOf(false) }
+
+        if (isLoadingDiasEspera) {
+            FloatingLoader()
+        }
+
+        LaunchedEffect(Unit) {
+            isLoadingDiasEspera = true
+            configCuestionarioImpl.getDiasEspera { response ->
+                println("response de la api: $response")
+                if (response != null) {
+                    if (response.code == 200) {
+                        if (response.data != null) {
+                            diasEspera = response.data.diasEspera
+                            isLoadingDiasEspera = false
+                        }
+                    }
+                } else {
+                    errorMessage = "El servidor no se encuentra disponible en estos momentos"
+                }
+            }
+        }
+
+        println("dias espera: $diasEspera")
+
+
+        if (diasEspera != null){
+
+
+
+        val currentMoment = Clock.System.now()
+        val currentDate = currentMoment.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val fechaCreacionUsuario = settings.getString("FECHA_CREACION", "")
+
+        val partes = fechaCreacionUsuario.split(" ") // ["12/05/2025", "19:32"]
+        val fecha = partes[0].split("/") // ["12", "05", "2025"]
+
+        val dia = fecha[0].toInt()
+        val mes = fecha[1].toInt()
+        val year = fecha[2].toInt()
+
+        val fechaCreacionUsuarioFormateada = LocalDate(year = year, monthNumber = mes, dayOfMonth = dia)
+
+
+        println("fecha create: ${settings.getString("FECHA_CREACION", "")}")
+        println("fecha creacion formateada: $fechaCreacionUsuarioFormateada")
+        val fechaCuestionario = fechaCreacionUsuarioFormateada.plus(DatePeriod(days = diasEspera!!))
+//        val fechaCuestionario = LocalDate(2025, 5, 30)
+        println("fecha para mostrar cuestionario: $fechaCuestionario")
+        println("mostrar cuestionario: ${currentDate >= fechaCuestionario}" )
+//            return
+
+        println("usuario completo el cuestionario: ${settings.getBoolean("CUESTIONARIO_COMPLETADO", false)}")
+
+//        if (currentDate == fechaCuestionario && !settings.getBoolean("CUESTIONARIO_COMPLETADO", false)){
+        if (currentDate >= fechaCuestionario && !settings.getBoolean("CUESTIONARIO_COMPLETADO", false)){
+            Scaffold{ innerPadding ->
+                Column(
+                    Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                ) {
+                    QuestionnaireScreen(navigator)
+                }
+            }
+        }else{
+
+
         var expanded by remember { mutableStateOf(false) }  // Estado para mostrar u ocultar el menú
         val navigator = LocalNavigator.currentOrThrow
 
@@ -330,5 +415,7 @@ class MainScreen : Screen {
                 }
             }
         }
+        }
+    }
     }
 }

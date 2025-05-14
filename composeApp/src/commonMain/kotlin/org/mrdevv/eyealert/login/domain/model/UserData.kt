@@ -8,5 +8,7 @@ data class UserData (
     val nombres: String,
     val apellidos: String,
     val email: String,
-    val rol: String
+    val rol: String,
+    val cuestionarioCompleado: Boolean,
+    val fecha: String
 )

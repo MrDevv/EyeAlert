@@ -69,10 +69,12 @@ fun ButtonRegister(
                 coroutineScope.launch {
                     val usuario = CreateUsuario(name, lastname, email, password)
                     authProvider.register(usuario) { userResponse ->
+                        println(userResponse)
                         isLoading = false
                         coroutineScope.launch {
                             when {
                                 userResponse == null -> snackbarHostState.showSnackbar("El servidor no está disponible. Inténtalo más tarde.")
+                                userResponse.code == 409 -> snackbarHostState.showSnackbar(userResponse.message)
                                 userResponse.code == 201 && userResponse.userData != null -> {
                                     clearFields()
                                     snackbarHostState.showSnackbar(

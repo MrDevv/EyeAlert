@@ -36,6 +36,7 @@ fun CardEvaluation(
     fecha: String,
     selectedEvaluacion: (Long) -> Unit
 ) {
+    var tiempoPrediccion = evaluacion.tiempoPredicion.toString().split(".")[0]
     Card(
         onClick = {
             selectedEvaluacion(evaluacion.id)
@@ -72,7 +73,8 @@ fun CardEvaluation(
                     )
                     Spacer(Modifier.width(5.dp))
                     Text(
-                        "${evaluacion.tiempoPredicion} ms",
+//                        "${evaluacion.tiempoPredicion} ms",
+                        "${tiempoPrediccion} ms",
                         fontSize = 12.sp,
                         color = Color.White
                     )

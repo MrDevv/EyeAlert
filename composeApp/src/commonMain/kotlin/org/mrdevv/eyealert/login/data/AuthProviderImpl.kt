@@ -26,7 +26,6 @@ class AuthProviderImpl : AuthProvider{
                     contentType(ContentType.Application.Json)
                     setBody(UserRequest(email, password))
                 }.body<UserResponse>()
-
                 onResponse(response)
             } catch (e: Exception) {
                 print("Error en la api: ${e.message}")

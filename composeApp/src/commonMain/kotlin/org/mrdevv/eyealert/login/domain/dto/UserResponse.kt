@@ -7,7 +7,7 @@ import org.mrdevv.eyealert.login.domain.model.UserData
 @Serializable
 data class UserResponse(
     @SerialName("data")
-    val userData: UserData?,
+    val userData: UserData? = null,
     @SerialName("message")
     val message: String,
     @SerialName("code")

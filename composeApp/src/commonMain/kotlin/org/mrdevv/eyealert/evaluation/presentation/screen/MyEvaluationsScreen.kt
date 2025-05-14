@@ -453,13 +453,14 @@ class MyEvaluationsScreen() : Screen {
                                 var iconBox: ImageVector = Icons.Default.QuestionMark
 
                                 var fechaFormat = evaluacion.fecha.split(" ")[0]
+                                var tiempoPrediccion = evaluacion.tiempoPredicion.toString().split(".")[0]
 
                                 if (evaluacion.resultado == "bajo") {
-                                    colorBox = 0xFF0C6D40.toInt()
+                                    colorBox = 0xFF2EA26C.toInt()
                                     textBox = "RIESGO BAJO"
                                     iconBox = Icons.Filled.Mood
                                 } else {
-                                    colorBox = 0xFFCC3724.toInt()
+                                    colorBox = 0xFFD44D3C.toInt()
                                     textBox = "RIESGO ALTO"
                                     iconBox = Icons.Filled.SentimentDissatisfied
                                 }
@@ -500,7 +501,8 @@ class MyEvaluationsScreen() : Screen {
                                                 )
                                                 Spacer(Modifier.width(5.dp))
                                                 Text(
-                                                    "${evaluacion.tiempoPredicion} ms",
+//                                                    "${evaluacion.tiempoPredicion} ms",
+                                                    "${tiempoPrediccion} ms",
                                                     fontSize = 12.sp,
                                                     color = Color.White
                                                 )

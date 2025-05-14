@@ -239,11 +239,11 @@ public class HomeScreen : Screen {
                                         var fechaFormat = evaluacion.fecha.split(" ")[0]
 
                                         if (evaluacion.resultado == "bajo") {
-                                            colorBox = 0xFF0C6D40.toInt()
+                                            colorBox = 0xFF2EA26C.toInt()
                                             textBox = "RIESGO BAJO"
                                             iconBox = Icons.Filled.Mood
                                         } else {
-                                            colorBox = 0xFFCC3724.toInt()
+                                            colorBox = 0xFFD44D3C.toInt()
                                             textBox = "RIESGO ALTO"
                                             iconBox = Icons.Filled.SentimentDissatisfied
                                         }

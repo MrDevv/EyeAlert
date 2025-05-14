@@ -54,7 +54,7 @@ fun ButtonLogin(navigator: Navigator, isEnableButton: Boolean, email: String, pa
                     authProvider.signIn(email, password) { userResponse ->
 //                    println(userResponse?.code)
 //                    println(userResponse?.userData)
-//                    println(userResponse)
+                    println(userResponse)
                         isLoading = false
 
                         if (userResponse == null){
@@ -67,6 +67,8 @@ fun ButtonLogin(navigator: Navigator, isEnableButton: Boolean, email: String, pa
                             settings.putString("NAME", userResponse.userData.nombres)
                             settings.putLong("ID", userResponse.userData.id)
                             settings.putString("ROL", userResponse.userData.rol)
+                            settings.putBoolean("CUESTIONARIO_COMPLETADO", userResponse.userData.cuestionarioCompleado)
+                            settings.putString("FECHA_CREACION", userResponse.userData.fecha)
                             navigator.replaceAll(MainScreen())
                         }else if (userResponse?.code == 200 && userResponse.userData == null){
                             coroutineScope.launch {

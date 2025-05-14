@@ -10,5 +10,5 @@ data class DatoInformativo (
     val descripcion: String,
     val fuente: String,
     @SerialName("fuente_multimedia")
-    val fuenteMultimedia: String
+    val fuenteMultimedia: String?
 )
