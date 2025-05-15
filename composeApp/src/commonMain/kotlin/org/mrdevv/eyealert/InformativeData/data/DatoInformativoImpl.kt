@@ -12,10 +12,11 @@ import org.mrdevv.eyealert.InformativeData.model.dto.ResponseDatoInformativo
 import org.mrdevv.eyealert.InformativeData.model.dto.ResponseDatosInformativos
 import org.mrdevv.eyealert.InformativeData.model.usecase.IDatoInformativo
 import org.mrdevv.eyealert.network.HttpClient
+import org.mrdevv.eyealert.utils.Constants
 
 class DatoInformativoImpl : IDatoInformativo {
     override fun getTresDatosInformativosAleatorios(onResponse: (ResponseDatosInformativos?) -> Unit) {
-        val url = "http://192.168.1.4:8080/api/v1/datosInformativos/aleatorios"
+        val url = "${Constants.BASE_URL}api/v1/datosInformativos/aleatorios"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -32,7 +33,7 @@ class DatoInformativoImpl : IDatoInformativo {
     }
 
     override fun getAllDatosInformativos(onResponse: (ResponseDatosInformativos?) -> Unit) {
-        val url = "http://192.168.1.4:8080/api/v1/datosInformativos"
+        val url = "${Constants.BASE_URL}api/v1/datosInformativos"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -49,7 +50,7 @@ class DatoInformativoImpl : IDatoInformativo {
     }
 
     override fun getDatoInformativoAleatorio(onResponse: (ResponseDatoInformativo?) -> Unit) {
-        val url = "http://192.168.1.4:8080/api/v1/datosInformativos/aleatorio"
+        val url = "${Constants.BASE_URL}api/v1/datosInformativos/aleatorio"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

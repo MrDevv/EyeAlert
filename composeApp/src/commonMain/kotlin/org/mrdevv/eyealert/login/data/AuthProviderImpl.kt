@@ -15,10 +15,11 @@ import org.mrdevv.eyealert.login.domain.dto.UserResponse
 import org.mrdevv.eyealert.login.domain.usecase.AuthProvider
 import org.mrdevv.eyealert.network.HttpClient
 import org.mrdevv.eyealert.register.domain.dto.CreateUsuario
+import org.mrdevv.eyealert.utils.Constants
 
 class AuthProviderImpl : AuthProvider{
     override fun signIn(email: String, password: String, onResponse: (UserResponse?) -> Unit) {
-        val url = "http://192.168.1.4:8080/api/v1/usuarios/auth"
+        val url = "${Constants.BASE_URL}api/v1/usuarios/auth"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -38,7 +39,7 @@ class AuthProviderImpl : AuthProvider{
     }
 
     override fun register(usuario: CreateUsuario, onResponse: (UserResponse?) -> Unit) {
-        val url = "http://192.168.1.4:8080/api/v1/usuarios"
+        val url = "${Constants.BASE_URL}api/v1/usuarios"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

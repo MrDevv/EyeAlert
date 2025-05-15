@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseDataEvaluacion
+import org.mrdevv.eyealert.settings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +43,17 @@ fun ModalDetailEvaluation(
     detailEvaluacion: ResponseDataEvaluacion,
     onChangeDetail: (ResponseDataEvaluacion?) -> Unit
 ) {
+
+    val colorResultEspecialista: Int
+
+    if (detailEvaluacion.resultadoEspecialista == "pendiente"){
+        colorResultEspecialista = 0xFF986c24.toInt()
+    }else if (detailEvaluacion.resultadoEspecialista == "acertado"){
+        colorResultEspecialista = 0xFF3e981f.toInt()
+    }else{
+        colorResultEspecialista = 0xFFaf4534.toInt()
+    }
+
     ModalBottomSheet(
         onDismissRequest = { onChangeDetail(null) },
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -108,9 +120,49 @@ fun ModalDetailEvaluation(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(hora, fontWeight = FontWeight.Bold)
+                    if (settings.getString("ROL", "") == "administrador"){
+                        Box(
+                            Modifier.clip(RoundedCornerShape(5.dp))
+                                .background(Color(colorResultEspecialista)) // color result espec.
+                        ) {
+                            Text(
+                                text = detailEvaluacion.resultadoEspecialista, // texto resultado especialista
+                                modifier = Modifier.padding(5.dp),
+                                color = Color.White
+                            )
+                        }
+                    }
                 }
 
                 Spacer(Modifier.height(10.dp))
+
+                if (settings.getString("ROL", "") == "administrador"){
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row {
+                            Text("Tiempo inicio predicción:")
+                            Spacer(Modifier.width(5.dp))
+                            Text(detailEvaluacion.tiempoPrediccionInicio.split(" ")[1], fontWeight = FontWeight.Bold)
+                        }
+                    }
+
+                    Spacer(Modifier.height(5.dp))
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row {
+                            Text("Tiempo fin predicción:")
+                            Spacer(Modifier.width(5.dp))
+                            Text(detailEvaluacion.tiempoPrediccionFin.split(" ")[1], fontWeight = FontWeight.Bold)
+                        }
+                    }
+
+                    Spacer(Modifier.height(10.dp))
+                }
+
 
                 LazyColumn(Modifier.fillMaxWidth()) {
                     items(detailEvaluacion.listaPreguntasRespuestas) { resp ->

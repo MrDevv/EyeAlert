@@ -20,13 +20,14 @@ import org.mrdevv.eyealert.evaluation.model.dto.ResponseEvaluacionDTO
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseNivelRiesgo
 import org.mrdevv.eyealert.evaluation.model.usecase.IEvaluacion
 import org.mrdevv.eyealert.network.HttpClient
+import org.mrdevv.eyealert.utils.Constants
 
 class EvaluacionImpl : IEvaluacion {
     override fun getEvaluacionesByUser(
         idUser: Long,
         onResponse: (ResponseEvaluacionByUser?) -> Unit
     ) {
-        val url = "http://192.168.1.4:8080/api/v1/usuarios/$idUser/evaluaciones"
+        val url = "${Constants.BASE_URL}api/v1/usuarios/$idUser/evaluaciones"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -46,7 +47,7 @@ class EvaluacionImpl : IEvaluacion {
         idUser: Long,
         onResponse: (ResponseEvaluacionByUser?) -> Unit
     ) {
-        val url = "http://192.168.1.4:8080/api/v1/usuarios/$idUser/evaluaciones/latest"
+        val url = "${Constants.BASE_URL}api/v1/usuarios/$idUser/evaluaciones/latest"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -66,7 +67,7 @@ class EvaluacionImpl : IEvaluacion {
         idUser: Long,
         onResponse: (ResponseEvaluacionByUser?) -> Unit
     ) {
-        val url = "http://192.168.1.4:8080/api/v1/usuarios/$idUser/evaluaciones/latest-seven-days"
+        val url = "${Constants.BASE_URL}api/v1/usuarios/$idUser/evaluaciones/latest-seven-days"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -86,7 +87,7 @@ class EvaluacionImpl : IEvaluacion {
         idUser: Long,
         onResponse: (ResponseEvaluacionByUser?) -> Unit
     ) {
-        val url = "http://192.168.1.4:8080/api/v1/usuarios/$idUser/evaluaciones/last-month"
+        val url = "${Constants.BASE_URL}api/v1/usuarios/$idUser/evaluaciones/last-month"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -106,7 +107,7 @@ class EvaluacionImpl : IEvaluacion {
         idEvaluacion: Long,
         onResponse: (ResponseDetailEvaluacion?) -> Unit
     ) {
-        val url = "http://192.168.1.4:8080/api/v1/detalleEvaluacion/$idEvaluacion"
+        val url = "${Constants.BASE_URL}api/v1/detalleEvaluacion/$idEvaluacion"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -126,7 +127,6 @@ class EvaluacionImpl : IEvaluacion {
         respuestasCuestionario: RequestRespuestasCuestionario,
         onResponse: (ResponseNivelRiesgo?) -> Unit
     ) {
-//        val url = "http://192.168.1.4:4000/evaluation"
         val url = "https://eyealertmodeloapi.onrender.com/evaluation"
 
 
@@ -153,7 +153,7 @@ class EvaluacionImpl : IEvaluacion {
         evaluacionDTO: CrearEvaluacionDTO,
         onResponse: (ResponseEvaluacionDTO?) -> Unit
     ) {
-        val url = "http://192.168.1.4:8080/api/v1/evaluaciones"
+        val url = "${Constants.BASE_URL}api/v1/evaluaciones"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

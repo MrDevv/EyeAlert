@@ -22,9 +22,15 @@ data class ResponseDataEvaluacion(
     val nombres : String,
     val apellidos : String,
     val fecha : String,
+    @SerialName("tiempo_prediccion_inicio")
+    val tiempoPrediccionInicio: String,
+    @SerialName("tiempo_prediccion_fin")
+    val tiempoPrediccionFin: String,
     @SerialName("tiempo_prediccion")
     val tiempoPrediccion : Double,
     val resultado : String,
+    @SerialName("resultado_especialista")
+    val resultadoEspecialista: String,
     @SerialName("listPreguntaRespuesta")
     val listaPreguntasRespuestas : List<ResponsePreguntaRespuesta>
 )

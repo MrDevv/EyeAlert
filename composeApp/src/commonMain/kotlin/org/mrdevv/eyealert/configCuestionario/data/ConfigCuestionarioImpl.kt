@@ -16,10 +16,11 @@ import org.mrdevv.eyealert.configCuestionario.model.dto.ResponseConfigCuestionar
 import org.mrdevv.eyealert.configCuestionario.model.dto.ResponseCuestionarioConocimientosDTO
 import org.mrdevv.eyealert.configCuestionario.model.usecase.IConfigCuestionario
 import org.mrdevv.eyealert.network.HttpClient
+import org.mrdevv.eyealert.utils.Constants
 
 class ConfigCuestionarioImpl : IConfigCuestionario {
     override fun getDiasEspera(onResponse: (ResponseConfigCuestionario?) -> Unit) {
-        val url = "http://192.168.1.4:8080/api/v1/cuestionarioConocimientos/dias-espera"
+        val url = "${Constants.BASE_URL}api/v1/cuestionarioConocimientos/dias-espera"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -39,7 +40,7 @@ class ConfigCuestionarioImpl : IConfigCuestionario {
         cuestionarioConocimientos: CreateCuestionarioConocimientos,
         onResponse: (ResponseCuestionarioConocimientosDTO?) -> Unit
     ) {
-        val url = "http://192.168.1.4:8080/api/v1/cuestionarioConocimientos"
+        val url = "${Constants.BASE_URL}api/v1/cuestionarioConocimientos"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

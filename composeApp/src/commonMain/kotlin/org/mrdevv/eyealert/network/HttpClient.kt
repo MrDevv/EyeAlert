@@ -11,10 +11,10 @@ import kotlinx.serialization.json.Json
 object HttpClient {
     val httpClient = HttpClient(CIO) {
         engine {
-            requestTimeout = 60000 // 60 segundos
+            requestTimeout = 120000 // 120 segundos
             endpoint {
-                connectTimeout = 20000 // 20 segundos
-                socketTimeout = 60000  // 60 segundos
+                connectTimeout = 40000 // 40 segundos
+                socketTimeout = 120000  // 120 segundos
             }
         }
         install(ContentNegotiation){

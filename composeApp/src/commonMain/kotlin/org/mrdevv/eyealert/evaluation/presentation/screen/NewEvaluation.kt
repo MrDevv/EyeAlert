@@ -364,6 +364,8 @@ public class NewEvaluation : Screen {
                                 evaluacionImpl.getNivelRiesgoEvaluacion(respuestasCuestionario) { response ->
                                     if (response != null) {
                                         if (response.status == 200) {
+                                            val tiempoPrediccionInicio = response.tiempoPredicionInicio
+                                            val tiempoPrediccionFin = response.tiempoPredicionFin
                                             val tiempoPrediccion = response.predictionTimeMs
                                             val resultado = response.resultEvaluation.toInt()
                                             val usuarioId = settings.getLong("ID", 0)
@@ -433,6 +435,8 @@ public class NewEvaluation : Screen {
 
                                             evaluacionImpl.crearEvaluacion(
                                                 CrearEvaluacionDTO(
+                                                    tiempoPrediccionInicio,
+                                                    tiempoPrediccionFin,
                                                     tiempoPrediccion,
                                                     resultado,
                                                     usuarioId,

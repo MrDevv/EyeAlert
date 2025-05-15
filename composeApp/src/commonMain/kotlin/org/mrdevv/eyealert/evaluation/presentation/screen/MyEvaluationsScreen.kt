@@ -125,8 +125,18 @@ class MyEvaluationsScreen() : Screen {
 
             val textResult: String
             val colorResult: Int
+            val colorResultEspecialista: Int
             val fecha: String = data.fecha.split(" ")[0]
             val hora: String = data.fecha.split(" ")[1]
+
+
+            if (data.resultadoEspecialista == "pendiente") {
+                colorResultEspecialista = 0xFF986c24.toInt()
+            } else if (data.resultadoEspecialista == "acertado") {
+                colorResultEspecialista = 0xFF3e981f.toInt()
+            } else {
+                colorResultEspecialista = 0xFFaf4534.toInt()
+            }
 
             if (data.resultado == "alto") {
                 colorResult = 0xFFCC3724.toInt()
@@ -195,43 +205,95 @@ class MyEvaluationsScreen() : Screen {
                                     color = Color.White
                                 )
                             }
+
                         }
                         Spacer(Modifier.height(5.dp))
+
                         Row(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(hora, fontWeight = FontWeight.Bold)
+                            if (settings.getString("ROL", "") == "administrador") {
+                                Box(
+                                    Modifier.clip(RoundedCornerShape(5.dp))
+                                        .background(Color(colorResultEspecialista)) // color result espec.
+                                ) {
+                                    Text(
+                                        text = data.resultadoEspecialista, // texto resultado especialista
+                                        modifier = Modifier.padding(5.dp),
+                                        color = Color.White
+                                    )
+                                }
+                            }
                         }
 
-                        Spacer(Modifier.height(10.dp))
+
+                        Spacer(Modifier.height(5.dp))
+                        if (settings.getString("ROL", "") == "administrador") {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row {
+                                    Text("Tiempo inicio predicción:")
+                                    Spacer(Modifier.width(5.dp))
+                                    Text(
+                                        data.tiempoPrediccionInicio.split(" ")[1],
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+
+                            Spacer(Modifier.height(5.dp))
+
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row {
+                                    Text("Tiempo fin predicción:")
+                                    Spacer(Modifier.width(5.dp))
+                                    Text(
+                                        data.tiempoPrediccionFin.split(" ")[1],
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+
+                            Spacer(Modifier.height(10.dp))
+
+                        }
 
                         LazyColumn(Modifier.fillMaxWidth()) {
-                            items(data.listaPreguntasRespuestas){ resp ->
-                                if (resp.pregunta == "Ingresa tu edad"){
+                            items(data.listaPreguntasRespuestas) { resp ->
+                                if (resp.pregunta == "Ingresa tu edad") {
                                     Row {
                                         Text("Edad:")
                                         Spacer(Modifier.width(5.dp))
                                         Text(resp.respuesta, fontWeight = FontWeight.Bold)
                                     }
                                     Spacer(Modifier.height(10.dp))
-                                }else if(resp.pregunta == "Selecciona tu genero"){
+                                } else if (resp.pregunta == "Selecciona tu genero") {
                                     Row {
                                         Text("Genero:")
                                         Spacer(Modifier.width(5.dp))
                                         Text(resp.respuesta, fontWeight = FontWeight.Bold)
                                     }
                                     Spacer(Modifier.height(10.dp))
-                                }else{
+                                } else {
                                     Column(Modifier.fillMaxWidth()) {
                                         Text(resp.pregunta)
                                         Spacer(Modifier.height(5.dp))
-                                        Text(modifier = Modifier.fillMaxWidth(), text =  resp.respuesta,textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+                                        Text(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            text = resp.respuesta,
+                                            textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                     }
                                     Spacer(Modifier.height(10.dp))
                                 }
-
-
 
 
                             }
@@ -239,7 +301,8 @@ class MyEvaluationsScreen() : Screen {
 
                         Spacer(Modifier.height(30.dp))
                         Button(
-                            modifier = Modifier.wrapContentHeight().fillMaxWidth().padding(horizontal = 40.dp),
+                            modifier = Modifier.wrapContentHeight().fillMaxWidth()
+                                .padding(horizontal = 40.dp),
                             shape = RoundedCornerShape(5.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF224164),
@@ -265,14 +328,14 @@ class MyEvaluationsScreen() : Screen {
 
         LaunchedEffect(seleccion) {
 //            delay(4000)
-            if (seleccion == "Todos"){
+            if (seleccion == "Todos") {
                 isLoading = true;
                 evaluacionImpl.getEvaluacionesByUser(settings.getLong("ID", 0)) { response ->
                     if (response != null) {
                         if (response.code == 200) {
                             if (response.data != null) {
                                 listEvaluations = response.data.evaluaciones
-                            } else{
+                            } else {
                                 listEvaluations = emptyList()
                             }
                         } else if (response.code == 500) {
@@ -286,15 +349,20 @@ class MyEvaluationsScreen() : Screen {
                 }
             }
 
-            if (seleccion == "Últimos 7 días"){
+            if (seleccion == "Últimos 7 días") {
                 isLoading = true;
-                evaluacionImpl.getLastWeekEvaluacionesByUser(settings.getLong("ID", 0)) { response ->
+                evaluacionImpl.getLastWeekEvaluacionesByUser(
+                    settings.getLong(
+                        "ID",
+                        0
+                    )
+                ) { response ->
                     println("response: $response")
                     if (response != null) {
                         if (response.code == 200) {
                             if (response.data != null) {
                                 listEvaluations = response.data.evaluaciones
-                            }else{
+                            } else {
                                 listEvaluations = emptyList()
                             }
                         } else if (response.code == 500) {
@@ -309,15 +377,20 @@ class MyEvaluationsScreen() : Screen {
                 }
             }
 
-            if (seleccion == "Último mes"){
+            if (seleccion == "Último mes") {
                 isLoading = true;
-                evaluacionImpl.getLastMonthEvaluacionesByUser(settings.getLong("ID", 0)) { response ->
+                evaluacionImpl.getLastMonthEvaluacionesByUser(
+                    settings.getLong(
+                        "ID",
+                        0
+                    )
+                ) { response ->
                     println("response: $response")
                     if (response != null) {
                         if (response.code == 200) {
                             if (response.data != null) {
                                 listEvaluations = response.data.evaluaciones
-                            }else{
+                            } else {
                                 listEvaluations = emptyList()
                             }
                         } else if (response.code == 500) {
@@ -419,15 +492,16 @@ class MyEvaluationsScreen() : Screen {
                     ) {
                         if (listEvaluations.isEmpty()) {
                             var messageEvaluationEmpty: String = ""
-                            if (seleccion == "Últimos 7 días"){
-                                messageEvaluationEmpty = "Aún no tienes evaluaciones en estos últimos 7 días."
+                            if (seleccion == "Últimos 7 días") {
+                                messageEvaluationEmpty =
+                                    "Aún no tienes evaluaciones en estos últimos 7 días."
                             }
 
-                            if (seleccion == "Último mes"){
+                            if (seleccion == "Último mes") {
                                 messageEvaluationEmpty = "Aún no tienes evaluaciones en este mes."
                             }
 
-                            if (seleccion == "Todos"){
+                            if (seleccion == "Todos") {
                                 messageEvaluationEmpty = "Aún no tienes evaluaciones."
                             }
 
@@ -453,7 +527,8 @@ class MyEvaluationsScreen() : Screen {
                                 var iconBox: ImageVector = Icons.Default.QuestionMark
 
                                 var fechaFormat = evaluacion.fecha.split(" ")[0]
-                                var tiempoPrediccion = evaluacion.tiempoPredicion.toString().split(".")[0]
+                                var tiempoPrediccion =
+                                    evaluacion.tiempoPredicion.toString().split(".")[0]
 
                                 if (evaluacion.resultado == "bajo") {
                                     colorBox = 0xFF2EA26C.toInt()

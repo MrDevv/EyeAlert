@@ -207,22 +207,22 @@ class MainScreen : Screen {
                                 onDismissRequest = { expanded = false },
                                 offset = DpOffset(x = 0.dp, y = 20.dp)
                             ) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                Icons.Default.SupervisedUserCircle,
-                                                contentDescription = ""
-                                            )
-                                            Spacer(Modifier.width(5.dp))
-                                            Text("Editar Perfil")
-                                        }
-                                    },
-                                    onClick = {
-                                        println("editar perfil")
-                                        expanded = false
-                                    }
-                                )
+//                                DropdownMenuItem(
+//                                    text = {
+//                                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+//                                            Icon(
+//                                                Icons.Default.SupervisedUserCircle,
+//                                                contentDescription = ""
+//                                            )
+//                                            Spacer(Modifier.width(5.dp))
+//                                            Text("Editar Perfil")
+//                                        }
+//                                    },
+//                                    onClick = {
+//                                        println("editar perfil")
+//                                        expanded = false
+//                                    }
+//                                )
 
                                 DropdownMenuItem(
                                     text = {

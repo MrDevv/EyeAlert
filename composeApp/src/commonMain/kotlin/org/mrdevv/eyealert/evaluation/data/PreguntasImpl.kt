@@ -10,10 +10,11 @@ import kotlinx.coroutines.withContext
 import org.mrdevv.eyealert.evaluation.model.dto.ResponsePreguntas
 import org.mrdevv.eyealert.evaluation.model.usecase.IPreguntas
 import org.mrdevv.eyealert.network.HttpClient
+import org.mrdevv.eyealert.utils.Constants
 
 class PreguntasImpl : IPreguntas {
     override fun getListPreguntas(onResponse: (ResponsePreguntas?) -> Unit) {
-        val url = "http://192.168.1.4:8080/api/v1/preguntas"
+        val url = "${Constants.BASE_URL}api/v1/preguntas"
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
