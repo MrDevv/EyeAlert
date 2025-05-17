@@ -197,7 +197,7 @@ fun QuestionnaireScreen(navigator: Navigator) {
         }
         Spacer(Modifier.height(7.dp))
         Text(
-            "4. Las personas con gotas para los ojos con esteroides a menudo tienen más probabilidades de contraer gluacoma",
+            "4. Las personas con gotas para los ojos con esteroides a menudo tienen más probabilidades de contraer glaucoma",
             modifier = Modifier.fillMaxWidth(),
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold
@@ -229,7 +229,7 @@ fun QuestionnaireScreen(navigator: Navigator) {
         }
         Spacer(Modifier.height(7.dp))
         Text(
-            "5. Las personas con miopía alta o hipermetropía tienen más probabilidades de contraer gluacoma",
+            "5. Las personas con miopía alta o hipermetropía tienen más probabilidades de contraer glaucoma",
             modifier = Modifier.fillMaxWidth(),
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold
@@ -325,7 +325,7 @@ fun QuestionnaireScreen(navigator: Navigator) {
         }
         Spacer(Modifier.height(7.dp))
         Text(
-            "8. El campo visual estrecho es un sintoma de glaucoma",
+            "8. El campo visual estrecho es un síntoma de glaucoma",
             modifier = Modifier.fillMaxWidth(),
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold
@@ -423,7 +423,7 @@ fun QuestionnaireScreen(navigator: Navigator) {
 
         Spacer(Modifier.height(7.dp))
         Text(
-            "11. El gluacoma tiene diferentes tipos",
+            "11. El glaucoma tiene diferentes tipos",
             modifier = Modifier.fillMaxWidth(),
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold
@@ -489,7 +489,7 @@ fun QuestionnaireScreen(navigator: Navigator) {
 
         Spacer(Modifier.height(7.dp))
         Text(
-            "13. La visita de seguimiento en la clínica no es necesaria después del tratamiento con láser o la cirugía del gluacoma",
+            "13. La visita de seguimiento en la clínica no es necesaria después del tratamiento con láser o la cirugía del glaucoma",
             modifier = Modifier.fillMaxWidth(),
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold

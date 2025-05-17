@@ -108,6 +108,7 @@ fun HighRisk(navigator: Navigator, isBottomSheetVisible: (Boolean) -> Unit) {
                     ) {
                         Text("Cerrar")
                     }
+                    Spacer(modifier = Modifier.height(30.dp))
                 }
             }
         }

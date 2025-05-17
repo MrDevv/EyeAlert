@@ -241,7 +241,7 @@ public class NewEvaluation : Screen {
                                     TextField(
                                         value = respuestasUsuario[pregunta.id] ?: "",
                                         onValueChange = { input ->
-                                            if (input.all { char -> char.isDigit() }) {
+                                            if (input.all { char -> char.isDigit() } && input.length <= 3) {
                                                 respuestasUsuario[pregunta.id] = input
                                             }
                                         },

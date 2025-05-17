@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lightbulb
@@ -30,7 +31,7 @@ fun CardInformativeData(infomativeData: DatoInformativo, selectedInformativeData
     Card(
         modifier = Modifier
             .width(250.dp)
-            .height(110.dp),
+            .wrapContentHeight(), // <-- Aquí el cambio
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF6DB2FF)
         ),
@@ -48,7 +49,8 @@ fun CardInformativeData(infomativeData: DatoInformativo, selectedInformativeData
         ) {
             Column(horizontalAlignment = Alignment.Start) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().weight(2.6f),
+                    modifier = Modifier
+                        .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -64,7 +66,9 @@ fun CardInformativeData(infomativeData: DatoInformativo, selectedInformativeData
                     imageVector = Icons.Default.Lightbulb,
                     contentDescription = null,
                     tint = Color(0xFFB2FF59),
-                    modifier = Modifier.size(32.dp).weight(1f)
+                    modifier = Modifier
+                        .size(32.dp)
+                        .padding(top = 4.dp)
                 )
             }
         }
