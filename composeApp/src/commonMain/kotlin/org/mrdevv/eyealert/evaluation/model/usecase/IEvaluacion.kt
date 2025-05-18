@@ -6,6 +6,8 @@ import org.mrdevv.eyealert.evaluation.model.dto.ResponseDetailEvaluacion
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseEvaluacionByUser
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseEvaluacionDTO
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseNivelRiesgo
+import org.mrdevv.eyealert.evaluation.model.dto.ResultadoEspecialista
+import org.mrdevv.eyealert.evaluation.model.dto.ResponseResultadoEspecialista
 
 interface IEvaluacion {
 
@@ -19,4 +21,5 @@ interface IEvaluacion {
     fun getNivelRiesgoEvaluacion(respuestasCuestionario: RequestRespuestasCuestionario, onResponse: (ResponseNivelRiesgo?) -> Unit )
 
     fun crearEvaluacion(evaluacionDTO: CrearEvaluacionDTO, onResponse: (ResponseEvaluacionDTO?) -> Unit)
+    fun actualizarResultadoEspecialista(id: Long, resultadoEspecialistaDto: ResultadoEspecialista, onResponse: (ResponseResultadoEspecialista?) -> Unit)
 }

@@ -34,6 +34,7 @@ fun ButtonRegister(
     name: String,
     lastname: String,
     email: String,
+    emailIsValid: Boolean,
     password: String,
     onShowContentLoginChange: (Boolean) -> Unit,
     hideKeyBoard: () -> Unit,
@@ -45,7 +46,7 @@ fun ButtonRegister(
 
     var isEnableButton by remember { mutableStateOf(false) }
 
-    if (name.isNotEmpty() && lastname.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()){
+    if (name.isNotEmpty() && lastname.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && emailIsValid){
         isEnableButton = true
     }else{
         isEnableButton = false

@@ -53,7 +53,7 @@ fun FormRegister(navigator: Navigator, onShowContentLoginChange: (Boolean) -> Un
     Spacer(Modifier.height(5.dp))
     Password(password) { password = it }
     Spacer(Modifier.height(10.dp))
-    ButtonRegister(navigator, authProvider, name, lastName, email, password, onShowContentLoginChange, keyboardController!!::hide, ::clearFields)
+    ButtonRegister(navigator, authProvider, name, lastName, email, isValidEmail, password, onShowContentLoginChange, keyboardController!!::hide, ::clearFields)
     DividerFormsAuth()
     ButtonGoToLogin(onShowContentLoginChange)
 }

@@ -304,7 +304,7 @@ public class HomeScreen : Screen {
                         Modifier.fillMaxWidth().background(Color(0xFF002249)),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text("SABIAS QUE...", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text("SABÍAS QUE...", color = Color.White, fontWeight = FontWeight.Bold)
                     }
 
                     if (isLoadingInformativeData) {

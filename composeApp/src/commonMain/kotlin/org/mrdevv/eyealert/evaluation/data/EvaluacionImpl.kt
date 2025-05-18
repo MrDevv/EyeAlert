@@ -3,6 +3,7 @@ package org.mrdevv.eyealert.evaluation.data
 import androidx.compose.runtime.Composable
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -18,6 +19,8 @@ import org.mrdevv.eyealert.evaluation.model.dto.ResponseDetailEvaluacion
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseEvaluacionByUser
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseEvaluacionDTO
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseNivelRiesgo
+import org.mrdevv.eyealert.evaluation.model.dto.ResponseResultadoEspecialista
+import org.mrdevv.eyealert.evaluation.model.dto.ResultadoEspecialista
 import org.mrdevv.eyealert.evaluation.model.usecase.IEvaluacion
 import org.mrdevv.eyealert.network.HttpClient
 import org.mrdevv.eyealert.utils.Constants
@@ -161,6 +164,32 @@ class EvaluacionImpl : IEvaluacion {
                     contentType(ContentType.Application.Json)
                     setBody(evaluacionDTO)
                 }.body<ResponseEvaluacionDTO>()
+
+                onResponse(response)
+
+            } catch (e: Exception) {
+                println("Error en la api: ${e.message}")
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onResponse(null)
+                }
+            }
+        }
+    }
+
+    override fun actualizarResultadoEspecialista(
+        id: Long,
+        resultadoEspecialistaDto: ResultadoEspecialista,
+        onResponse: (ResponseResultadoEspecialista?) -> Unit
+    ) {
+        val url = "${Constants.BASE_URL}api/v1/evaluaciones/${id}"
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = HttpClient.httpClient.patch(url){
+                    contentType(ContentType.Application.Json)
+                    setBody(resultadoEspecialistaDto)
+                }.body<ResponseResultadoEspecialista>()
 
                 onResponse(response)
 

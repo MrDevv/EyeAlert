@@ -28,7 +28,7 @@ object StatsTab: Tab {
             return remember {
                 TabOptions(
                     index = 1u,
-                    title = "ESTADISTICAS",
+                    title = "ESTADÍSTICAS",
                     icon = icon
                 )
             }

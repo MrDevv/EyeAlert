@@ -67,6 +67,7 @@ import org.mrdevv.eyealert.evaluation.model.dto.ResponseDataEvaluacion
 import org.mrdevv.eyealert.evaluation.model.dto.ResponseDetailEvaluacion
 import org.mrdevv.eyealert.evaluation.presentation.component.FloatingButton
 import org.mrdevv.eyealert.evaluation.presentation.component.FloatingLoader
+import org.mrdevv.eyealert.evaluation.presentation.component.ModalDetailEvaluation
 import org.mrdevv.eyealert.ui.components.BoxErrorMessage
 import org.mrdevv.eyealert.ui.components.HeaderScreens
 import org.mrdevv.eyealert.ui.components.Loader
@@ -129,15 +130,6 @@ class MyEvaluationsScreen() : Screen {
             val fecha: String = data.fecha.split(" ")[0]
             val hora: String = data.fecha.split(" ")[1]
 
-
-            if (data.resultadoEspecialista == "pendiente") {
-                colorResultEspecialista = 0xFF986c24.toInt()
-            } else if (data.resultadoEspecialista == "acertado") {
-                colorResultEspecialista = 0xFF3e981f.toInt()
-            } else {
-                colorResultEspecialista = 0xFFaf4534.toInt()
-            }
-
             if (data.resultado == "alto") {
                 colorResult = 0xFFCC3724.toInt()
                 textResult = "RIESGO ALTO"
@@ -146,183 +138,8 @@ class MyEvaluationsScreen() : Screen {
                 textResult = "RIESGO BAJO"
             }
 
-            ModalBottomSheet(
-                onDismissRequest = { detailEvaluacion = null },
-                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-                contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
-                dragHandle = {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(30.dp)
-                            .background(Color(0xFF002249)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Spacer(
-                            Modifier
-                                .width(50.dp)
-                                .height(8.dp)
-                                .clip(
-                                    RoundedCornerShape(4.dp)
-                                )
-                                .background(Color.White)
-                        )
-                    }
-                }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFF002249))
-                        .padding(bottom = 10.dp, start = 15.dp)
-                ) {
-                    Text(
-                        "DETALLE DE LA EVALUACIÓN",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-
-                Box(
-                    Modifier.fillMaxWidth().background(Color.White)
-                ) {
-                    Column(
-                        Modifier.padding(20.dp)
-                    ) {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(fecha, fontWeight = FontWeight.Bold)
-                            Box(
-                                Modifier.clip(RoundedCornerShape(5.dp))
-                                    .background(Color(colorResult))
-                            ) {
-                                Text(
-                                    text = textResult,
-                                    modifier = Modifier.padding(5.dp),
-                                    color = Color.White
-                                )
-                            }
-
-                        }
-                        Spacer(Modifier.height(5.dp))
-
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(hora, fontWeight = FontWeight.Bold)
-                            if (settings.getString("ROL", "") == "administrador") {
-                                Box(
-                                    Modifier.clip(RoundedCornerShape(5.dp))
-                                        .background(Color(colorResultEspecialista)) // color result espec.
-                                ) {
-                                    Text(
-                                        text = data.resultadoEspecialista, // texto resultado especialista
-                                        modifier = Modifier.padding(5.dp),
-                                        color = Color.White
-                                    )
-                                }
-                            }
-                        }
-
-
-                        Spacer(Modifier.height(5.dp))
-                        if (settings.getString("ROL", "") == "administrador") {
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row {
-                                    Text("Tiempo inicio predicción:")
-                                    Spacer(Modifier.width(5.dp))
-                                    Text(
-                                        data.tiempoPrediccionInicio.split(" ")[1],
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-
-                            Spacer(Modifier.height(5.dp))
-
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row {
-                                    Text("Tiempo fin predicción:")
-                                    Spacer(Modifier.width(5.dp))
-                                    Text(
-                                        data.tiempoPrediccionFin.split(" ")[1],
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-
-                            Spacer(Modifier.height(10.dp))
-
-                        }
-
-                        LazyColumn(Modifier.fillMaxWidth()) {
-                            items(data.listaPreguntasRespuestas) { resp ->
-                                if (resp.pregunta == "Ingresa tu edad") {
-                                    Row {
-                                        Text("Edad:")
-                                        Spacer(Modifier.width(5.dp))
-                                        Text(resp.respuesta, fontWeight = FontWeight.Bold)
-                                    }
-                                    Spacer(Modifier.height(10.dp))
-                                } else if (resp.pregunta == "Selecciona tu genero") {
-                                    Row {
-                                        Text("Genero:")
-                                        Spacer(Modifier.width(5.dp))
-                                        Text(resp.respuesta, fontWeight = FontWeight.Bold)
-                                    }
-                                    Spacer(Modifier.height(10.dp))
-                                } else {
-                                    Column(Modifier.fillMaxWidth()) {
-                                        Text(resp.pregunta)
-                                        Spacer(Modifier.height(5.dp))
-                                        Text(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            text = resp.respuesta,
-                                            textAlign = TextAlign.Center,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
-                                    Spacer(Modifier.height(10.dp))
-                                }
-
-
-                            }
-                        }
-
-                        Spacer(Modifier.height(30.dp))
-                        Button(
-                            modifier = Modifier.wrapContentHeight().fillMaxWidth()
-                                .padding(horizontal = 40.dp),
-                            shape = RoundedCornerShape(5.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF224164),
-                                contentColor = Color.White
-                            ),
-                            onClick = {
-                                detailEvaluacion = null
-                            }
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text("Cerrar")
-                            }
-                        }
-                        Spacer(Modifier.height(20.dp))
-                    }
-                }
-
+            ModalDetailEvaluation(fecha, textResult, colorResult, hora, data) {
+                detailEvaluacion = it
             }
         }
 
